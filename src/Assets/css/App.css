@@ -1,0 +1,18 @@
+.App {
+  text-align: center;
+  font: 'Iransans' !important;
+}
+.ml-auto{
+  margin-left: auto;
+}
+
+.navbar.bg-dark .navbar-brand ,.navbar.bg-dark .nav-link {
+  color: #fff ;
+}
+.navbar.bg-dark .dropdown-menu li{
+  padding: 5px;
+  text-align: right;
+}
+.navbar.bg-dark .dropdown-menu p{
+  margin-bottom: 5px;
+}
