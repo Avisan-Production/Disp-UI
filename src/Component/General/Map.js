@@ -16,8 +16,6 @@ useEffect(()=>{
         var marker = L.marker(arr).addTo(map);
         marker.bindPopup(item.pop).openPopup();
       }
-      
-    
     }
     else{
       document.getElementById("map").innerHTML=`<p>داده مناسب برای نمایش نقشه یافت نشد</p>`
