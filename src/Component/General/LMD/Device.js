@@ -683,7 +683,7 @@ let ChangeApn=()=>{
                         />
                       </div>
                       <div className="col-md-6 col-12 mb-2">
-                        <p>توان اسمی</p>
+                        <p>توان اسمی <small className="text-secondary">(KW)</small></p>
                         <input
                           type="text"
                           className="form-control"
@@ -920,7 +920,7 @@ let ChangeApn=()=>{
           </div>
 
           <div className="mb-2">
-            <p>توان اسمی :</p>
+            <p>توان اسمی <small className="text-secondary">(KW)</small>:</p>
             <input
               type="number"
               className="form-control"

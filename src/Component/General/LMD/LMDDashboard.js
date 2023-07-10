@@ -709,7 +709,7 @@ debugger;
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={()=>SendSMS()}>ثبت تغییرات</Button>
+          <Button variant="primary" onClick={()=>SendSMS()}>ارسال پیامک</Button>
           <Button variant="secondary" onClick={() => setModal(false)}>
             بستن
           </Button>

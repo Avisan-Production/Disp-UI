@@ -15,6 +15,7 @@ function Groups() {
   const [groupID, setGroupID] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [search,setSearch]=useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState({
     show: false,
     title: "",
@@ -22,6 +23,7 @@ function Groups() {
     bg: "",
   });
   let Search=(txt)=>{
+    setSearchQuery(txt)
   console.log(devices);
   console.log(search);
     if(txt.length>0){
@@ -31,7 +33,7 @@ function Groups() {
     else{
       setSearch(devices)
     }
-    checkThem(groupDevices)
+    // checkThem(groupDevices)
   }
   let getGroups = () => {
     axios
@@ -57,7 +59,7 @@ function Groups() {
       .then((res) => {
         setDevices(res.data);
         setSearch(res.data);
-        checkThem(groupDevices)
+        // checkThem(groupDevices)
       })
       .catch((err) => {
         setToast({
@@ -69,12 +71,12 @@ function Groups() {
       });
   };
 let resetModal=()=>{
-    var elems=document.querySelectorAll(
-        'input[type="checkbox"][name="device-serial"]:checked'
-      )
-      for(var item of elems){
-        item.checked=false;
-      }
+    // var elems=document.querySelectorAll(
+    //     'input[type="checkbox"][name="device-serial"]:checked'
+    //   )
+    //   for(var item of elems){
+    //     item.checked=false;
+    //   }
       setGroupID(0)
       setGroupName('')
       setGroupDevices([])
@@ -105,6 +107,7 @@ let removeGroup=(id)=>{
   
 }
 let checkChange=(serial)=>{
+  debugger;
   var list=groupDevices;
     if(list.includes(serial)){
       list.splice(list.indexOf(serial),1);
@@ -112,31 +115,24 @@ let checkChange=(serial)=>{
     else{
       list.push(serial)
     }
-    setGroupDevices(list)
-    console.log(list);
-    console.log(groupDevices);
-    var srch=search;
-    setSearch([])
-    setSearch(srch)
+  setGroupDevices(list)
+ var srch=search;
+  setSearch([])
+  setTimeout(() => {
+ setSearch(srch)
+  }, 50);
+  
 
 }
 let SubmitGroup=(add)=>{
     
     if(groupName.length>0){
-      var selectedSerials = [];
-      var elems=document
-        .querySelectorAll(
-          'input[type="checkbox"][name="device-serial"]:checked'
-        )
-        for(var item of elems){
-            var serial = parseInt(item.value);
-          selectedSerials.push(serial);
-        }
-        if(selectedSerials.length>0){
+      
+        if(groupDevices.length>0){
             if(add){
                 var dto = {
                     name: groupName,
-                    devices:selectedSerials
+                    devices:groupDevices
                   };
                  console.log(dto); 
                  axios.post(`${appsetting.BaseApiUrl}/api/group`,dto)
@@ -164,7 +160,7 @@ let SubmitGroup=(add)=>{
                 var editdto = {
                     id:groupID,
                     name: groupName,
-                    devices:selectedSerials
+                    devices:groupDevices
                   };
                  console.log(dto); 
                  axios.patch(`${appsetting.BaseApiUrl}/api/group`,editdto)
@@ -224,16 +220,16 @@ let openEditModal=(group)=>{
     setShowModal(true)
     
 }
-let checkThem=(list)=>{
-    console.log(list)
-        for(var item of list){
-            var el=document.querySelector(`[name="device-serial"][value="${item}"]`)
-            if(el)
-                el.checked=true
-        }    
+// let checkThem=(list)=>{
+//     console.log(list)
+//         for(var item of list){
+//             var el=document.querySelector(`[name="device-serial"][value="${item}"]`)
+//             if(el)
+//                 el.checked=true
+//         }    
     
     
-}
+// }
   useEffect(() => {
     getGroups();
    
@@ -253,7 +249,7 @@ let checkThem=(list)=>{
             </button>
           </div>
           <div className="card-body">
-            <table className="table table-bordered table-hovered">
+            <table className="table  table-hovered">
               <thead>
                 <tr>
                   <td>ردیف</td>
@@ -271,14 +267,16 @@ let checkThem=(list)=>{
                         <td>{g.name}</td>
                         <td>{g.devices.length}</td>
                         <td className="d-flex justify-content-center">
-                          <button className="btn-none m-2 text-danger"
-                          onClick={()=>removeGroup(g.id)}
+                          <button
+                            className="btn-none m-2 text-danger hover"
+                            onClick={() => removeGroup(g.id)}
                           >
                             {" "}
                             <FontAwesomeIcon icon={solid("trash")} />
                           </button>
-                          <button className="btn-none m-2 "
-                          onClick={()=>openEditModal(g)}
+                          <button
+                            className="btn-none m-2 text-primary hover"
+                            onClick={() => openEditModal(g)}
                           >
                             {" "}
                             <FontAwesomeIcon icon={solid("eye")} />
@@ -304,7 +302,7 @@ let checkThem=(list)=>{
           onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
           show={toast.show}
           bg={toast.bg}
-          delay={3000} 
+          delay={3000}
           autohide
         >
           <Toast.Header>{toast.title}</Toast.Header>
@@ -325,41 +323,57 @@ let checkThem=(list)=>{
               onChange={(e) => setGroupName(e.target.value)}
             />
           </div>
-          <p>زیر مجموعه گروه را انتخاب کنید</p>
-            <div>
+          <p>زیر مجموعه گروه را انتخاب کنید ({groupDevices.length} مورد انتخاب شد)</p>
+          <div>
             <div className="col-12 d-md-flex justify-content-start">
-                <p className="mt-auto mb-auto">جستجو</p>
-                <input className="form-control me-3 w-50" onChange={(e)=>Search(e.target.value)}></input>
-              </div>
-              <hr/>
-          <div
-            className="mt-2"
-            style={{ maxHeight: "250px", overflowY: "scroll" }}
-          >
-          
-              
+              <p className="mt-auto mb-auto">جستجو</p>
+              <input
+                className="form-control me-3 w-50"
+                onChange={(e) => Search(e.target.value)}
+              ></input>
+            </div>
+            <hr />
+            <div
+              className="mt-2"
+              style={{ maxHeight: "250px", overflowY: "scroll" }}
+            >
               {devices.length > 0 ? (
                 <>
                   <ul className="list-group" style={{ marginRight: "-40px" }}>
-                    {search.map((d) => (
+                    {search.map((d,i) => (
                       <>
-                        <li className="list-group-item">
-                          <input
-                            className="form-check-input me-1"
-                            type="checkbox"
-                            name="device-serial"
-                            value={d.serial}
-                            style={{ marginLeft: "10px" }}
-                            id={"firstCheckbox" + d.serial}
-                            checked={groupDevices.includes(d.serial)}
-                            onChange={(e)=>checkChange(d.serial)}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor={"firstCheckbox" + d.serial}
+                        <li className="list-group-item" key={i}>
+                          {groupDevices.includes(d.serial) ? (
+                            <>
+                              <FontAwesomeIcon
+                                icon={solid("check-square")}
+                                className="text-success"
+                                style={{ marginLeft: 5 }}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <span className="me-3"></span>
+                            </>
+                          )}
+                          <span>{d.deviceName}</span>
+                          <button
+                            className="btn-none hover "
+                            style={{ float: "left" }}
+                            onClick={()=>checkChange(d.serial)}
                           >
-                            {d.deviceName}
-                          </label>
+                            {groupDevices.includes(d.serial) ? 
+                              <>
+                                
+                                <FontAwesomeIcon icon={solid("times-circle")} className="text-danger" />
+                              </>
+                             : 
+                              <>
+                               
+                                <FontAwesomeIcon icon={solid("check-circle")} className="text-success" />
+                              </>
+                            }
+                          </button>
                         </li>
                       </>
                     ))}
@@ -367,16 +381,19 @@ let checkThem=(list)=>{
                 </>
               ) : (
                 <>
-                <div className="alert alert-warning">
+                  <div className="alert alert-warning">
                     <p>پست اختصاص داده نشده یافت نشد</p>
-                </div>
+                  </div>
                 </>
               )}
             </div>
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={() => SubmitGroup(groupID>0?false:true)}>
+          <Button
+            variant="primary"
+            onClick={() => SubmitGroup(groupID > 0 ? false : true)}
+          >
             ثبت تغییرات
           </Button>
           <Button variant="secondary" onClick={() => resetModal()}>

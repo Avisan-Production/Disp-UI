@@ -599,7 +599,7 @@ function Station() {
                       <div className="row">
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>توان اسمی</p>
+                            <p>توان اسمی <small className="text-secondary">(KW)</small></p>
                             <input
                               className="form-control"
                               value={b.nominalPower + " kw"}
@@ -607,7 +607,7 @@ function Station() {
                             ></input>
                           </div>
                           <div className="mt-2">
-                            <p>توان لحظه ای</p>
+                            <p>توان لحظه ای <small className="text-secondary">(KW)</small></p>
                             <input
                               className="form-control"
                               value={
@@ -622,7 +622,7 @@ function Station() {
 
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>ولتاژ</p>
+                            <p>ولتاژ <small className="text-secondary">(V)</small></p>
                             <input
                               className="form-control"
                               value={b.voltage}
@@ -630,7 +630,7 @@ function Station() {
                             ></input>
                           </div>
                           <div className="mt-2">
-                            <p>جریان</p>
+                            <p>جریان <small className="text-secondary">(A)</small></p>
                             <input
                               className="form-control"
                               value={b.current}
@@ -640,7 +640,7 @@ function Station() {
                         </div>
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>انرژی</p>
+                            <p>انرژی <small className="text-secondary">(KWH)</small></p>
                             <input
                               className="form-control"
                               value={

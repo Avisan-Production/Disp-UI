@@ -154,14 +154,14 @@ function App() {
                 </li>
                 <li className="nav-item">
                   <button
-                    className="btn-none mt-auto mb-auto me-1 p-2"
+                    className="btn-none mt-auto mb-auto me-1 p-2 text-white"
                     style={{ fontSize: "1.1em" }}
                     onClick={() => changetheme()}
                   >
                     {darktheme ? (
                       <>
                         <FontAwesomeIcon
-                          className="text-white  "
+                          className="text-white"
                           icon={solid("sun")}
                         />
                       </>
