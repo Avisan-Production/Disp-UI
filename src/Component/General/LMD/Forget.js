@@ -75,7 +75,7 @@ function Forget (){
                 </div>
                 <div className="col-12 mb-3 d-flex justify-content-center">
                   <button className="btn btn-secondary m-auto">
-                    ورود به حساب کاربری
+                    بازیابی
                   </button>
                 </div>
               </form>

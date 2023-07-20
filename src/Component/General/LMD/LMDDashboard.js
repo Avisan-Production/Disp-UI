@@ -21,6 +21,7 @@ const LMDDashboard = () => {
   const [sortAp, setSortAp] = useState(false);
   const [sortRelay, setSortRelay] = useState(false);
   const [sortConnect, setSortConnect] = useState(false);
+  const [selectedDevices, setSelectedDevices] = useState([]);
   
 
 
@@ -46,27 +47,60 @@ const LMDDashboard = () => {
     }
   }
   //Select Or Deselect checkboxes
-  function checkAll(event) {
-    var chs = document.querySelectorAll('[name="ch-serial"]');
-    for (var item of chs) {
-      item.checked = event.target.checked;
-    }
+  function checkAll() {
+   if(selectedDevices.length>0){
+    setSelectedDevices([])
+   }
+   else{
+    setSelectedDevices(devices)
+   }
+   var srch=search;
+   setTimeout(() => {
+    setSearch(srch)
+   }, 100);
   }
   //
-  function setSerials() {
-    var serials = [];
-    var chs = document.querySelectorAll('[name="ch-serial"]:checked');
-    for (var item of chs) {
-      var serial = parseInt(item.getAttribute("data-ch-serial"));
-      var board = parseInt(item.getAttribute("data-ch-board"));
-
-      serials.push({ serial: serial, board: board });
+  function setSerials(serial,board) {
+    var arr=selectedDevices;
+    debugger;
+    var item=devices.find(x=>x.serial===serial&&x.boardNumber===board)
+    
+    var ind=arr.findIndex(x=>x.serial===serial&&x.boardNumber===board);
+    if(ind<0){
+      selectedDevices.push(item)
     }
-    return serials;
+    
+    setSelectedDevices(arr)
+    console.log(selectedDevices);
+    var srch=search;
+    setSearch([])
+    setTimeout(() => {
+      setSearch(srch)
+    }, 5);
+    
+  }
+  function remSerials(serial,board) {
+    var arr=selectedDevices;
+    debugger;
+    var ind=arr.findIndex(x=>x.serial===serial&&x.boardNumber===board);
+    if(ind>-1){
+      arr.splice(ind,1);
+    }
+    
+    setSelectedDevices(arr)
+    console.log(selectedDevices);
+    var srch=search;
+    setSearch([])
+    setTimeout(() => {
+      setSearch(srch)
+    }, 5);
   }
   function turnOff() {
     if (window.confirm("آیا از ارسال دستور قطع مطمئن هستید؟")) {
-      var boards = setSerials();
+      var boards=[]
+    for(var item of selectedDevices){
+      boards.push({serial:item.serial,board:item.boardNumber})
+    }
       if (boards.length > 0) {
         var dto = { cmd: 12, boards: boards };
         axios
@@ -99,7 +133,10 @@ const LMDDashboard = () => {
   }
   function turnOn() {
     if (window.confirm("آیا از ارسال درخواست وصل مطمئن هستید؟")) {
-      var boards = setSerials();
+      var boards=[]
+    for(var item of selectedDevices){
+      boards.push({serial:item.serial,board:item.boardNumber})
+    }
       if (boards.length < 0) {
         alert("ایستگاهی انتخاب نشده است");
       }
@@ -152,10 +189,9 @@ const LMDDashboard = () => {
   let SendSMS=()=>{
     if(smsText.length>0){
       var serials = [];
-      var chs = document.querySelectorAll('[name="ch-serial"]:checked');
-      for (var item of chs) {
-        var serial = parseInt(item.getAttribute("data-ch-serial"));
-        serials.push(serial);
+      
+      for(var item of selectedDevices){
+        serials.push(item.serial)
       }
       if(serials.length>0){
         var dto={
@@ -228,7 +264,7 @@ const LMDDashboard = () => {
     var ap= sortAp
     var rel=sortRelay
     var con=sortConnect
-debugger;
+
       switch(type){
         case 0:
           ap= !sortAp
@@ -253,7 +289,7 @@ debugger;
         var ret=0;
         if(ap) ret+=b.activePower-a.activePower
         if(rel) ret+=b.relay===a.relay?0:b.relay?1:-1
-        if(con) ret+=b.isConnected===a.isConnected?0:b.isConnected?1:-1
+        if(con) ret+=b.isConnected===a.isConnected?0:b.isConnected?10:-10
         return ret
       })
       setSearch(data)
@@ -294,8 +330,8 @@ debugger;
           var data = response.data.devices.sort((a,b)=>{
             var ret=0;
             if(ap) ret+=b.activePower-a.activePower
-            if(rel) ret+=b.relay===a.relay?0:b.relay?1:-1
-            if(con) ret+=b.isConnected===a.isConnected?0:b.isConnected?1:-1
+        if(rel) ret+=b.relay===a.relay?0:b.relay?1:-1
+        if(con) ret+=b.isConnected===a.isConnected?0:b.isConnected?10:-10
             return ret
           })
           
@@ -319,7 +355,7 @@ debugger;
         console.log('group=>',response.data);
       });
       console.log("fires");
-  }, [,]);
+  }, []);
 
   const context = useOutletContext();
 
@@ -464,21 +500,16 @@ debugger;
                 </div>
                 <hr />
                 <br />
-
+                <p>تعداد {selectedDevices.length} ایستگاه انتخاب شده است</p>
                 <table className="table table-responsive  table-hover ">
                   <thead>
                     <tr>
-                      <td>
-                        <input
-                          type="checkbox"
-                          name="check-all"
-                          onChange={checkAll}
-                        />
-                      </td>
+                        <td>#</td>
+                     
                       <td>
                         <div className="d-flex justify-content-center">
                         {searchMode?<>
-                        <input className="form-control" onChange={(e)=>Search(e.target.value)} />
+                        <input className="form-control" id="devSearch" type="search" onChange={(e)=>Search(e.target.value)} />
                         <button className="btn-none" onClick={()=>setSearchMode(false)}><FontAwesomeIcon icon={solid('times-circle')} /></button>
                         </>
                         :
@@ -506,21 +537,39 @@ debugger;
                       <td>ارتباط با سامانه
                       <button  style={{color:sortConnect?'#000':'#ccc'}} data-sort-con={sortConnect} className="btn-none mt-auto mb-auto hover" onClick={()=>sort(2)}><FontAwesomeIcon icon={solid('sort-alpha-down')} /></button>
                       </td>
+                      <td>
+                      <button className="btn-none" onClick={()=>checkAll()}>
+                        {selectedDevices.length>0?
+                      <>
+                        لغو
+                      </>  :
+                      <>
+                       انتخاب همه
+                      </>
+                      }
+                      
+                      </button>
+                      </td>
                     </tr>
                   </thead>
                   <tbody>
                     {devices.length > 0
-                      ? search.map((x) => (
+                      ? search.map((x,i) => (
                           <>
-                            <tr key={x.serial} data-serial={x.serial}>
+                            <tr key={x.serial} data-serial={x.serial} >
                               <td>
-                                <input
-                                  type="checkbox"
-                                  name="ch-serial"
-                                  data-ch-serial={x.serial}
-                                  data-ch-board={x.boardNumber}
-                                />
+                              <span style={{marginRight:'-5px',marginLeft:'5px'}}>
+                              {selectedDevices.find(c=>c.serial===x.serial&&c.boardNumber===x.boardNumber)!==undefined&&
+                                <>
+                                
+                                <FontAwesomeIcon icon={solid('check-square')} color="green" />
+                                </>
+                                
+                                }
+                                </span>
+                                <span>{i+1}</span>
                               </td>
+                              
                               <td>
                                 <Link to={`/station/${x.serial}`}>
                                   {x.deviceName + " - " + x.boardName}
@@ -547,6 +596,22 @@ debugger;
                                   }`}
                                   data-el="con"
                                 ></span>
+                              </td>
+                              <td>
+                                {selectedDevices.find(v=>v.serial===x.serial&&v.boardNumber===x.boardNumber)===undefined?<>
+                                  <button className="btn-none hover" onClick={()=>setSerials(x.serial,x.boardNumber)}>
+                                    انتخاب
+                                  </button>
+                                </>
+                                :<>
+                                <button className="btn-none hover" onClick={()=>remSerials(x.serial,x.boardNumber)}>
+                                    لغو
+                                  </button>
+                                </>
+                              
+                                }
+                              
+                               
                               </td>
                             </tr>
                           </>

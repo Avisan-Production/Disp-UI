@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BarChart, Bar, Cell,Brush, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, Cell,Brush, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { DatePicker  } from "zaman";
@@ -26,7 +26,7 @@ function GroupCoopReport(){
     var chartWith =
       document.getElementsByClassName("chart")[0] !== undefined
         ? document.getElementsByClassName("chart")[0].offsetWidth
-        : 900;
+        : 1100;
   let select=(val,range)=>{
     var gp=parseInt(val)
     if(range){
@@ -64,6 +64,10 @@ function GroupCoopReport(){
           
           setChartData(response.data);
           ShowChart(true);
+          chartWith =
+      document.getElementsByClassName("chart")[0] !== undefined
+        ? document.getElementsByClassName("chart")[0].offsetWidth
+        : 1100;
         });
 
     }
@@ -221,15 +225,16 @@ function GroupCoopReport(){
           width={chartWith}
           height={450}
           data={chartData.values}
-        
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          {/* <XAxis dataKey="name" angle={270}    tickMargin={20} /> */}
           <YAxis />
           <Tooltip />
           <Legend />
            
-          <Bar dataKey="coop" background={{ fill: '#eee' }} name="همکاری" fill="#8884d8" label={{ position: 'top' }} />
+          <Bar dataKey="coop"   background={{ fill: '#eee' }} name="همکاری" fill="#000"  >
+            <LabelList dataKey="name" width='100%' pheight='100%'  angle={-90}/>
+            </Bar>
         </BarChart>
       
               </div>
