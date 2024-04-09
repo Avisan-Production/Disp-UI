@@ -1,7 +1,6 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import bg from "../../../Assets/images/login-bg.jpg";
 import { useState } from "react";
-import appsetting from '../../../appsettings.json'
 import axios from "axios";
 
 
@@ -22,7 +21,7 @@ function Forget (){
       if (username.length > 0 ) {
         let dto = { username: username };
         axios
-          .post(`${appsetting.BaseApiUrl}/api/user/forget`, dto)
+          .post(`/api/user/forget`, dto)
           .then(function (response) {
             console.log(response);
             setMessage(response.data)
@@ -30,7 +29,7 @@ function Forget (){
           })
           .catch(function (error) {
             console.log(error);
-            setMessage(error.data)
+            setMessage(error.response.data)
             setMessageClass("danger")
           });
       }
@@ -40,50 +39,69 @@ function Forget (){
       }
      
     };
-    return(
-        <>
-        <div className="col-md-8 offset-md-2 col-10 offset-1 login">
+    return (
+      <>
+        <div
+          className="col-12 "
+          style={{ height: "100%", overflow: "hidden !important" }}
+        >
           <div className="row">
             <div className="col-12 col-md-6 d-flex">
-              <img src={bg} className="login-bg" alt="background" />
+              <img
+                src={bg}
+                style={{
+                  width: "100%",
+                  overflow: "hidden",
+                  height: "auto",
+                  display: "block",
+                  margin: "auto",
+                }}
+                alt="background"
+              />
             </div>
-            <div className="col-12 col-md-6 login-from ">
+            <div
+              className="col-12 col-md-6 p-5 login-from "
+              style={{ height: "100vh", overflow: "hidden" }}
+            >
               <h2 className="text-center">سامانه مدیریت بار آویسان</h2>
               <p className="text-center mt-3">بازیابی حساب کاربری</p>
-              {message !== "" && 
+          
+
+              <form onSubmit={handleSubmit} className="d-flex ">
+                <div className="col-12 col-md-8 mx-auto mt-5">
+                {message !== "" && (
                 <>
                   <br />
                   <div className={`alert alert-${messageClass}`}>
-                    <p>{message}</p>
+                    {message}
                   </div>
                   <br />
                 </>
-              }
-  
-              <form onSubmit={handleSubmit}>
-                <div className="col-12 mb-3">
-                  <p>نام کاربری را وارد کنید</p>
-                  <input
-                    className="form-control"
-                    onChange={(event) => setUsername(event.target.value)}
-                    type="text"
-                  ></input>
-                </div>
-               
-                <div className="col-12 mb-3">
-                  <a href="/">ورود به حساب کاربری</a>
-                </div>
-                <div className="col-12 mb-3 d-flex justify-content-center">
-                  <button className="btn btn-secondary m-auto">
-                    بازیابی
-                  </button>
+              )}
+                  <div className="col-12 mb-3">
+                    <p>نام کاربری را وارد کنید</p>
+                    <input
+                      className="form-control"
+                      onChange={(event) => setUsername(event.target.value)}
+                      type="text"
+                    ></input>
+                  </div>
+
+                  <div className="col-12 mb-3 d-flex  justify-content-center">
+                    <button className="btn btn-primary w-100 p-3 m-auto">
+                      بازیابی
+                    </button>
+                  </div>
+                  <div className="col-12 mt-5">
+                    <a href="/">ورود به حساب کاربری</a>
+                  </div>
                 </div>
               </form>
             </div>
           </div>
         </div>
       </>
-    )
+    );
 }
 
 export default Forget;

@@ -10,6 +10,8 @@ import {
   XAxis,
   YAxis,
   Tooltip,
+  ResponsiveContainer,
+  Label,
 } from "recharts";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
@@ -24,6 +26,9 @@ function Station() {
 
   const [device, setDevice] = useState({});
   const [chartSelect, setChartSelect] = useState(0);
+  
+const [contacts,SetContacts]=useState([]);
+
   const [toast, setToast] = useState({
     show: false,
     title: "",
@@ -67,8 +72,7 @@ function Station() {
   const [extraDetailModal, setExtraModal] = useState(false);
   const [extraDetailBoard, setExtraBoard] = useState(0);
   const [extraDetailChillerTonnage, setExtraChillerTonnage] = useState("");
-  const [extraDetailContractualDimand, setExtraContractualDimand] =
-    useState("");
+  const [extraDetailContractualDimand, setExtraContractualDimand] =useState("");
   const [extraDetailFileNumber, setExtraFileNumber] = useState("");
   const [extraDetailMeterCoefficient, setExtraMeterCoefficient] = useState("");
   const [extraDetailSubscriberBillID, setExtraSubscriberBillID] = useState("");
@@ -86,13 +90,9 @@ function Station() {
   //   channel:0,StartDate:new Date().toLocaleString(),EndDate:new Date().toLocaleString(),RelayStatus:false,Active:false
   // });
 
-  var chartWith =
-    document.getElementsByClassName("chart")[0] !== undefined
-      ? document.getElementsByClassName("chart")[0].offsetWidth
-      : 900;
   let removeTemplate = (id) => {
     axios
-      .post(`${appsetting.BaseApiUrl}/api/sms/template/remove/${id}`)
+      .post(`/api/sms/template/remove/${id}`)
       .then((res) => {
         setToast({
           show: true,
@@ -113,7 +113,7 @@ function Station() {
   };
   let GetTemplates = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/sms/template`)
+      .get(`/api/sms/template`)
       .then(function (response) {
         setTemplates(response.data);
       })
@@ -133,7 +133,7 @@ function Station() {
         text: smsText,
       };
       axios
-        .post(`${appsetting.BaseApiUrl}/api/sms/send`, dto)
+        .post(`/api/sms/send`, dto)
         .then((res) => {
           setToast({
             show: true,
@@ -154,7 +154,7 @@ function Station() {
 
       if (SaveAsTemplate) {
         axios
-          .post(`${appsetting.BaseApiUrl}/api/sms/template`, { text: smsText })
+          .post(`/api/sms/template`, { text: smsText })
           .then((res) => {
             setToast({
               show: true,
@@ -193,17 +193,15 @@ function Station() {
       start.setMinutes(0);
       start.setSeconds(0);
       var dto = {
-        serial: serial,
+        stationID: serial,
         boardNumber:chartSelect,
         startDate: start.toJSON(),
         endDate: now.toJSON(),
       };
       console.log(dto);
       axios
-        .post(`${appsetting.BaseApiUrl}/api/device/data/board/range`, dto)
+        .post(`/api/device/data/board/range`, dto)
         .then(function (response) {
-          console.log("data=>", response.data);
-  
           setChartData(response.data.datas);
         })
         .catch((err)=>{
@@ -240,7 +238,7 @@ function Station() {
   let submitExtraDetail = () => {
     if (window.confirm("آیا از ثبت تغییرات مطمئن هستید ؟")) {
       var dto = {
-        serial: serial,
+        stationID: serial,
         boardNumber: extraDetailBoard,
         chillerTonnage: extraDetailChillerTonnage,
         contractualDimand: extraDetailContractualDimand,
@@ -251,7 +249,7 @@ function Station() {
         subscriberTarrif: extraDetailSubscriberTarrif,
       };
       axios
-        .patch(`${appsetting.BaseApiUrl}/api/device/board/detail`, dto)
+        .patch(`/api/device/board/detail`, dto)
         .then(function (response) {
           resetExtra();
           setToast({
@@ -277,7 +275,7 @@ function Station() {
     if (window.confirm(`آیا از ارسال دستور ${cmdTxt} مطمئن هستید؟`)) {
       var dto = { serial: serial, board: board, relay: 0, cmd: cmd };
       axios
-        .post(`${appsetting.BaseApiUrl}/api/command/request`, dto)
+        .post(`/api/command/request`, dto)
         .then(function (response) {
           setToast({
             show: true,
@@ -295,6 +293,30 @@ function Station() {
           });
         });
     }
+  };
+  let TimerRefresh = () => {
+    
+    
+      var dto = { serial: serial, board: 0,channel:0, cmd:61 };
+      axios
+        .post(`/api/command/request`, dto)
+        .then(function (response) {
+          setToast({
+            show: true,
+            title: "درخواست",
+            text: "درخواست شما با موفقیت ثبت شد",
+            bg: "success",
+          });
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "درخواست",
+            text: "در ثبت درخواست شما خطا رخ داده است",
+            bg: "danger",
+          });
+        });
+    
   };
   // let ShowTimer1Modal = (chan) => {
   //   var t = timers1.find((x) => x.channel === chan);
@@ -350,7 +372,7 @@ function Station() {
       };
       console.log(dto);
       axios
-        .post(`${appsetting.BaseApiUrl}/api/command/request`, dto)
+        .post(`/api/command/request`, dto)
         .then(function (response) {
           setToast({
             show: true,
@@ -451,25 +473,39 @@ function Station() {
 
   let getStation = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/station/${serial}`)
+      .get(`/api/device/station/${serial}`)
       .then(function (response) {
         setDevice(response.data);
         console.log(response.data);
       });
   };
   let getGis = () => {
-    console.log(device);
     var arr = [];
     arr.push({lat:device.lat !== undefined ? device.lat : 0,lon:device.lon !== undefined ? device.lon : 0,pop:`<b>ایستگاه ${device.name}</b>`});
-
-    console.log("arr->", arr);
     return arr;
   };
+
+  let getContacts=()=>{
+    axios
+    .get(`/api/device/contact/${serial}`)
+    .then((res) => {
+     SetContacts(res.data);
+    })
+    .catch((err) => {
+      setToast({
+        show: true,
+        title: "لیست مخاطبین",
+        text: "در واکشی لیست مخاطبین خطا رخ داده است",
+        bg: "danger",
+      });
+    });
+  }
   useEffect(() => {
     GetTemplates();
     getStation();
+    getContacts();
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/Timers/2/${serial}`)
+      .get(`/api/device/Timers/2/${serial}`)
       .then(function (response) {
         setTimers2(response.data);
         console.log(response.data);
@@ -599,7 +635,10 @@ function Station() {
                       <div className="row">
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>توان اسمی <small className="text-secondary">(KW)</small></p>
+                            <p>
+                              توان اسمی{" "}
+                              <small className="text-secondary">(KW)</small>
+                            </p>
                             <input
                               className="form-control"
                               value={b.nominalPower + " kw"}
@@ -607,7 +646,10 @@ function Station() {
                             ></input>
                           </div>
                           <div className="mt-2">
-                            <p>توان لحظه ای <small className="text-secondary">(KW)</small></p>
+                            <p>
+                              توان لحظه ای{" "}
+                              <small className="text-secondary">(KW)</small>
+                            </p>
                             <input
                               className="form-control"
                               value={
@@ -622,7 +664,10 @@ function Station() {
 
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>ولتاژ <small className="text-secondary">(V)</small></p>
+                            <p>
+                              ولتاژ{" "}
+                              <small className="text-secondary">(V)</small>
+                            </p>
                             <input
                               className="form-control"
                               value={b.voltage}
@@ -630,7 +675,10 @@ function Station() {
                             ></input>
                           </div>
                           <div className="mt-2">
-                            <p>جریان <small className="text-secondary">(A)</small></p>
+                            <p>
+                              جریان{" "}
+                              <small className="text-secondary">(A)</small>
+                            </p>
                             <input
                               className="form-control"
                               value={b.current}
@@ -640,7 +688,10 @@ function Station() {
                         </div>
                         <div className="col-12 col-md-4">
                           <div className="mt-2">
-                            <p>انرژی <small className="text-secondary">(KWH)</small></p>
+                            <p>
+                              انرژی{" "}
+                              <small className="text-secondary">(KWH)</small>
+                            </p>
                             <input
                               className="form-control"
                               value={
@@ -691,21 +742,25 @@ function Station() {
               <>
                 <div className="card mt-5">
                   <div className="card-header bg-dark text-white d-flex justify-content-start">
-                   <p className="mt-auto mb-auto"> نمودار لحظه ای توان</p>
+                    <p className="mt-auto mb-auto"> نمودار لحظه ای توان</p>
                     <div className=" me-auto d-flex justify-content-start w-50">
                       <select
                         className="form-control m-auto"
-                        onChange={(e) => setChartSelect(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          setChartSelect(parseInt(e.target.value))
+                        }
                       >
                         <option value={0}>ایستگاه را انتخاب کنید</option>
-                        {device.boards.map((b,i) => (
+                        {device.boards.map((b, i) => (
                           <>
-                            <option key={i}  value={b.boardNumber}>{b.name}</option>
+                            <option key={i} value={b.boardNumber}>
+                              {b.name}
+                            </option>
                           </>
                         ))}
                       </select>
                       <button
-                      style={{width:'inherit'}}
+                        style={{ width: "inherit" }}
                         className="btn btn-success m-auto me-2"
                         onClick={() => getData()}
                       >
@@ -714,34 +769,60 @@ function Station() {
                     </div>
                   </div>
                   <div className="card-body chart">
-                    {chartData.length > 0 ? (
-                      <>
-                        <LineChart
-                          width={chartWith}
-                          height={450}
-                          data={chartData}
-                          margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-                        >
-                          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                          <XAxis dataKey="dateText" name="زمان" />
-                          <YAxis />
-                          <Line
-                            type="monotone"
-                            dataKey="pa"
-                            name="توان"
-                            unit="kw"
-                            stroke="#8884d8"
-                          />
-                          <Tooltip />
-                        </LineChart>
-                      </>
+                    {chartSelect > 0 ? (
+                      chartData.length > 0 ? (
+                        <>
+                          <div dir="ltr" style={{ height: 450, width: "100%" }}>
+                            <ResponsiveContainer width={"100%"} height={"100%"}>
+                              <LineChart
+                                data={chartData}
+                                margin={{
+                                  top: 5,
+                                  right: 20,
+                                  bottom: 5,
+                                  left: 0,
+                                }}
+                              >
+                                <CartesianGrid
+                                  stroke="#ccc"
+                                  strokeDasharray="5 5"
+                                />
+                                <XAxis dataKey="dateText">
+                                  <Label position="left">زمان</Label>
+                                </XAxis>
+
+                                <YAxis tickCount={20}>
+                                  <Label position="center" angle={-90} dx={-20}>
+                                    توان(KW)
+                                  </Label>
+                                </YAxis>
+                                <Line
+                                  type="monotone"
+                                  dataKey="power"
+                                  name="توان"
+                                  unit="kw"
+                                  stroke="#8884d8"
+                                />
+                                <Tooltip />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-center">
+                            داده ای برای نمایش یافت نشد
+                          </p>
+                        </>
+                      )
                     ) : (
                       <>
                         <p className="text-center">
                           <FontAwesomeIcon
                             className="fa-4x text-warning"
                             icon={solid("exclamation-triangle")}
-                          /><br/>
+                          />
+                          <br />
                           ابتدا ایستگاه را انتخاب کنید
                         </p>
                       </>
@@ -761,9 +842,37 @@ function Station() {
             )}
           </div>
           <div className="col-12 col-md-4 ">
+            <div className="card mb-4">
+              <div className="card-header bg-dark text-white d-flex justify-content-start">
+                شماره تماس مسئولین تاسیسات
+              </div>
+              <div className="card-body">
+                {contacts.length ? (
+                  contacts.map((item, ind) => (
+                    <>
+                      <div
+                        key={ind}
+                        className="p-2 mb-3 border border-dark rounded-3 d-flex justify-content-start"
+                      >
+                        <p className="mb-0 text-secondary">{item.name}</p>
+                        <p className="mb-0 me-auto">{item.number}</p>
+                      </div>
+                    </>
+                  ))
+                ) : (
+                  <>
+                    <p>مخاطبی یافت نشد</p>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className="card ">
               <div className="card-header bg-dark text-white d-flex justify-content-start">
                 زمان بندی
+                <button className="btn btn-none me-auto text-white">
+                  <FontAwesomeIcon icon={solid("refresh")} onClick={()=>{TimerRefresh()}} />
+                </button>
               </div>
               <div className="card-body">
                 <ul className="nav nav-tabs card-header-tabs">

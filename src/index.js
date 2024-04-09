@@ -7,7 +7,6 @@ import ErrorPage from './Component/General/ErrorPage'
 import LMDDashboard from './Component/General/LMD/LMDDashboard'
 import Login from './Component/General/Login'
 import axios from 'axios';
-import appsettings from './appsettings.json'
 import Station from './Component/General/LMD/Station';
 import Users from './Component/General/LMD/Users';
 import Devices from './Component/General/LMD/Devices';
@@ -21,14 +20,20 @@ import ReportDeviceCoop from './Component/General/LMD/ReportDeviceCoop';
 import Profile from './Component/General/Profile';
 import GroupCoopReport from './Component/General/LMD/GroupCoopReport';
 import SMSReport from './Component/General/LMD/SMSReport';
-
+import appsettings from './appsettings.json'
+import MapPage from './Component/General/LMD/MapPage';
+import Setting from './Component/General/Setting';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+let theme=localStorage.getItem('theme')
+if(theme)
+  document.documentElement.setAttribute('data-bs-theme', theme)
 
-
+const baseURL=appsettings.BaseApiUrl
 axios.interceptors.request.use(request => {
   // console.log(request);
   // Edit request config
+  request.baseURL=baseURL
   var token=localStorage.token;
   if(token){
     request.headers.Authorization = `Bearer ${token}`
@@ -51,10 +56,12 @@ axios.interceptors.response.use(response => {
   console.log("errr=>",error.config);
   if(error.response.status===401)
   {
+    console.log('token expired');
     var rt=localStorage.getItem("refreshtoken")
     if(rt!==null || rt!==undefined){
-      axios.post(`${appsettings.BaseApiUrl}/api/user/refresh`,{token:rt})
+      axios.post(`/api/user/refresh`,{token:rt})
       .then(res=>{
+        console.log('refreshed');
           localStorage.setItem("token",res.data.token);
           localStorage.setItem("refreshtoken",res.data.refreshToken);
           error.config.headers.Authorization = `Bearer ${res.data.token}`
@@ -64,7 +71,6 @@ axios.interceptors.response.use(response => {
     }
     
   }
-  // console.log("err=>",error);
   return Promise.reject(error);
 });
 
@@ -91,6 +97,8 @@ const router = createBrowserRouter([
       {path:"/group/:id",element:<Group />},
       {path:"/forget",element:<Forget />},
       {path:"/profile",element:<Profile />},
+      {path:"/map",element:<MapPage />},
+      {path:"/setting",element:<Setting />},
     ]
   }
   

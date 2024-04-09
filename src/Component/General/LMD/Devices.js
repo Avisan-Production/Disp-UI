@@ -48,7 +48,7 @@ let resetStates=()=>{
 }
 let fetchTimers=()=>{
   if(window.confirm("آیا از ارسال درخواست واکشی تایمر مطمئن هستید ؟")){
-    axios.post(`${appsetting.BaseApiUrl}/api/command/request/timers`)
+    axios.post(`/api/command/request/timers`)
     .then((res)=>{
         setToast({show:true,title:"واکشی تایمر",text:res.data,bg:"success"})
     })
@@ -71,7 +71,7 @@ let addDevice=()=>{
           simCardNumber: simCardNumber,
           type: 0,
         };
-        axios.post(`${appsetting.BaseApiUrl}/api/device/add`,dto)
+        axios.post(`/api/device/add`,dto)
         .then((res)=>{
             setToast({show:true,title:"افزودن دستگاه",text:res.data,bg:"success"})
             getDevices();
@@ -79,7 +79,7 @@ let addDevice=()=>{
             setModal(false)
         })
         .catch((err)=>{
-            setToast({show:true,title:"افزودن دستگاه",text:err.data,bg:"danger"})
+            setToast({show:true,title:"افزودن دستگاه",text:err.response.data,bg:"danger"})
         })
     }
             
@@ -88,10 +88,10 @@ let addDevice=()=>{
 let removeDevice=(serial)=>{
   if (window.confirm("آیا از حذف دستگاه مطمئن هستید ؟")) {
     var dto={
-      serial:serial
+      stationID:parseInt(serial)
     }
     axios
-      .post(`${appsetting.BaseApiUrl}/api/device/remove`,dto)
+      .post(`/api/device/remove`,dto)
       .then((res) => {
         setToast({
           show: true,
@@ -105,7 +105,7 @@ let removeDevice=(serial)=>{
         setToast({
           show: true,
           title: "حذف دستگاه",
-          text: err.data,
+          text: err.response.data,
           bg: "danger",
         });
       });
@@ -113,7 +113,7 @@ let removeDevice=(serial)=>{
 }
 let getDevices=()=>{
  
-    axios.get(`${appsetting.BaseApiUrl}/api/device/all`)
+    axios.get(`/api/device/all`)
     .then((response)=>
      {
         console.log(response.data)
@@ -121,7 +121,7 @@ let getDevices=()=>{
         setSearch(response.data)
      })
      .catch((err)=>{
-        console.log(err.data)
+        console.log(err.response.data)
      })
 }
 useEffect(()=>{
@@ -176,8 +176,8 @@ useEffect(()=>{
                 <tbody>
                   {search.map((x,i) => (
                     <>
-                      <tr key={x.serial}>
-                        <td>{i+1}</td>
+                      <tr key={x.id}>
+                        <td>{x.id}</td>
                         <td>{x.serial}</td>
                         <td>{x.deviceName}</td>
                     
@@ -187,14 +187,14 @@ useEffect(()=>{
 
                         <td className="d-flex justify-content-between">
                           <button className="btn-none"
-                          onClick={()=>removeDevice(x.serial)}
+                          onClick={()=>removeDevice(x.id)}
                           >
                             <FontAwesomeIcon
                               className="text-danger"
                               icon={solid("trash")}
                             />
                           </button>
-                          <Link to={`/device/${x.serial}`} className="btn-none">
+                          <Link to={`/device/${x.id}`} className="btn-none">
                             <FontAwesomeIcon icon={solid("eye")} />
                           </Link>
                         </td>

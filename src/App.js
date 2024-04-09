@@ -16,14 +16,16 @@ function App() {
   const [stationAccess, setStationAccess] = useState(false);
   const [reportAccess, setReportAccess] = useState(false);
   const [groupAccess, setGroupAccess] = useState(false);
-  const [darktheme,setDarkTheme] = useState(false);
+  const theme=localStorage.getItem("theme")
+  
+  const [darktheme,setDarkTheme] = useState(theme!==null?(theme==='dark'?true:false):false);
 
   const navigate = useNavigate();
   const SignOut = () => {
     var rToken = localStorage.getItem("refreshtoken");
     var dto = { token: rToken };
     axios
-      .post(`${appsetting.BaseApiUrl}/api/user/signout`, dto)
+      .post(`/api/user/signout`, dto)
       .then(function (response) {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshtoken");
@@ -31,12 +33,13 @@ function App() {
         navigate("/");
       })
       .catch(function (err) {
-        console.log(err.data);
+        console.log(err.response.data);
       });
   };
   let getUser = () => {
-    axios.get(`${appsetting.BaseApiUrl}/api/user`).then((res) => {
+    axios.get(`/api/user`).then((res) => {
       setUser(res.data);
+      localStorage.setItem("role",res.data.type)
        setTimeout(() => {
           var arr = [];
           for (var item of res.data.accesses) {
@@ -56,22 +59,26 @@ function App() {
     if (document.documentElement.getAttribute('data-bs-theme')==='dark') {
       document.documentElement.setAttribute('data-bs-theme', 'light')
       setDarkTheme(false)
+      localStorage.setItem('theme','light')
     } else {
       document.documentElement.setAttribute('data-bs-theme', 'dark')
       setDarkTheme(true)
+      localStorage.setItem('theme','dark')
+
     }
   } 
+  var token = localStorage.getItem("token");
   useEffect(() => {
    
-    var token = localStorage.getItem("token");
     if ( token !== null) {
       setJwtToken(token);
       getUser();
     } else {
       setJwtToken("");
+      if(window.location.pathname==="/forget")return
       navigate('/')
     }
-  }, []);
+  }, [token]);
 
   return (
     <>

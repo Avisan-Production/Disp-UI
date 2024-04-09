@@ -10,7 +10,7 @@ const LMDAside=(props)=>{
   const [searchDevices,setSearchDevices]=useState([]);
   let getStation = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/boards/detail`)
+      .get(`/api/device/boards/detail`)
       .then(function (response) {
         setDevices(response.data);
         console.log(response.data);
@@ -25,7 +25,12 @@ const LMDAside=(props)=>{
       setSearchDevices([]);
     }
   }
+const role=localStorage.getItem("role")
+  useEffect(()=>{
+  },[props])
+
     useEffect(()=>{
+      console.log('fired!!!');
       getStation();
     },[])
     
@@ -153,11 +158,21 @@ const LMDAside=(props)=>{
                         </li>
                       </>
                     )}
+                    {role==="0" && (
+                      <>
+                        <li>
+                          <a className="dropdown-item" href="/setting">
+                            تنظیمات
+                          </a>
+                        </li>
+                      </>
+                    )}
+
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link disabled" href="#!">
-                    مانیتورینگ
+                  <a className="nav-link " href="/map">
+                    نقشه GIS ایستگاه ها
                   </a>
                 </li>
               </ul>
@@ -175,7 +190,7 @@ const LMDAside=(props)=>{
                       <ul>
                         {searchDevices.map((d)=>(<>
                           <li>
-                          <a href={`/station/${d.serial}`}>{d.name}</a>
+                          <a href={`/station/${d.stationID}`}>{d.name}</a>
                         </li> 
                         </>))}
                        

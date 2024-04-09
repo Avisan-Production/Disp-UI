@@ -14,6 +14,8 @@ function Groups() {
   const [groupName, setGroupName] = useState("");
   const [groupID, setGroupID] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [temp, setTemp] = useState(false);
+  const [addGroupModal, setAddModalModal] = useState(true);
   const [search,setSearch]=useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [toast, setToast] = useState({
@@ -37,7 +39,7 @@ function Groups() {
   }
   let getGroups = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/group/all`)
+      .get(`/api/group/all`)
       .then((res) => {
         setGroups(res.data);
         console.log(res.data);
@@ -52,7 +54,7 @@ function Groups() {
       });
   };
   let getDevices = (add) => {
-    var url=`${appsetting.BaseApiUrl}/api/device/${add?'unassigned':'all'}`
+    var url=`/api/device/${add?'unassigned':'all'}`
     
     axios
       .get(url)
@@ -84,7 +86,7 @@ let resetModal=()=>{
 }
 let removeGroup=(id)=>{
     if(window.confirm('آیا از حذف گروه مطمئن هستید ؟ ')){
-        axios.post(`${appsetting.BaseApiUrl}/api/group/remove/${id}`)
+        axios.post(`/api/group/remove/${id}`)
         .then((res)=>{
            setToast({
                show: true,
@@ -107,7 +109,7 @@ let removeGroup=(id)=>{
   
 }
 let checkChange=(serial)=>{
-  debugger;
+ 
   var list=groupDevices;
     if(list.includes(serial)){
       list.splice(list.indexOf(serial),1);
@@ -116,16 +118,10 @@ let checkChange=(serial)=>{
       list.push(serial)
     }
   setGroupDevices(list)
- var srch=search;
-  setSearch([])
-  setTimeout(() => {
- setSearch(srch)
-  }, 50);
-  
-
+  setTemp(!temp)
 }
 let SubmitGroup=(add)=>{
-    
+   
     if(groupName.length>0){
       
         if(groupDevices.length>0){
@@ -135,7 +131,7 @@ let SubmitGroup=(add)=>{
                     devices:groupDevices
                   };
                  console.log(dto); 
-                 axios.post(`${appsetting.BaseApiUrl}/api/group`,dto)
+                 axios.post(`/api/group`,dto)
                  .then((res)=>{
                     setToast({
                         show: true,
@@ -151,7 +147,7 @@ let SubmitGroup=(add)=>{
                     setToast({
                         show: true,
                         title: "گروه ها",
-                        text: err.data,
+                        text: err.response.data,
                         bg: "danger",
                       }); 
                  })
@@ -163,7 +159,7 @@ let SubmitGroup=(add)=>{
                     devices:groupDevices
                   };
                  console.log(dto); 
-                 axios.patch(`${appsetting.BaseApiUrl}/api/group`,editdto)
+                 axios.patch(`/api/group`,editdto)
                  .then((res)=>{
                     setToast({
                         show: true,
@@ -218,7 +214,7 @@ let openEditModal=(group)=>{
     setGroupDevices(group.devices)
     getDevices(false);
     setShowModal(true)
-    
+    setAddModalModal(false)
 }
 // let checkThem=(list)=>{
 //     console.log(list)
@@ -260,10 +256,10 @@ let openEditModal=(group)=>{
               </thead>
               <tbody>
                 {groups.length > 0 ? (
-                  groups.map((g) => (
+                  groups.map((g,i) => (
                     <>
                       <tr key={g.id}>
-                        <td>{groups.indexOf(g) + 1}</td>
+                        <td>{i + 1}</td>
                         <td>{g.name}</td>
                         <td>{g.devices.length}</td>
                         <td className="d-flex justify-content-center">
@@ -311,7 +307,9 @@ let openEditModal=(group)=>{
       </ToastContainer>
       <Modal show={showModal} onHide={() => resetModal()}>
         <Modal.Header>
-          <Modal.Title>ثبت گروه جدید </Modal.Title>
+          <Modal.Title>
+          {addGroupModal>0?<>ایجاد گروه جدید</>:<>ویرایش گروه {groupName}</>}  
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div>
@@ -343,7 +341,7 @@ let openEditModal=(group)=>{
                     {search.map((d,i) => (
                       <>
                         <li className="list-group-item" key={i}>
-                          {groupDevices.includes(d.serial) ? (
+                          {groupDevices.includes(d.id) ? (
                             <>
                               <FontAwesomeIcon
                                 icon={solid("check-square")}
@@ -360,9 +358,9 @@ let openEditModal=(group)=>{
                           <button
                             className="btn-none hover "
                             style={{ float: "left" }}
-                            onClick={()=>checkChange(d.serial)}
+                            onClick={()=>checkChange(d.id)}
                           >
-                            {groupDevices.includes(d.serial) ? 
+                            {groupDevices.includes(d.id) ? 
                               <>
                                 
                                 <FontAwesomeIcon icon={solid("times-circle")} className="text-danger" />

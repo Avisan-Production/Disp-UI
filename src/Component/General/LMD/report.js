@@ -10,12 +10,14 @@ import {
   Tooltip,
   Legend,
   Brush,
+  ResponsiveContainer,
+  Label,
 } from "recharts";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import { DatePicker  } from "zaman";
+import SearchSelect from "../../SearchSelect";
 
-import appsetting from "../../../appsettings.json";
 
 function Report() {
   const [devices, setDevices] = useState([]);
@@ -31,10 +33,6 @@ function Report() {
   });
   const [chartData, setChartData] = useState([]);
 
-  var chartWith =
-    document.getElementsByClassName("chart")[0] !== undefined
-      ? document.getElementsByClassName("chart")[0].offsetWidth
-      : 900;
 
   let getData = () => {
    console.log(selectedDate.to)
@@ -52,14 +50,14 @@ function Report() {
     end.setMinutes(59)
     end.setSeconds(59)
     var dto = {
-      serial: selectedDevice,
+      stationID: selectedDevice,
       boardNumber:selectedBoard,
       startDate: start.toJSON(),
       endDate: end.toJSON(),
     };
     console.log(dto);
     axios
-      .post(`${appsetting.BaseApiUrl}/api/device/data/board/range`, dto)
+      .post(`/api/device/data/board/range`, dto)
       .then(function (response) {
         console.log(response.data);
         
@@ -84,12 +82,12 @@ function Report() {
     end.setMinutes(59)
     end.setSeconds(59)
     var dto = {
-      serial: selectedDevice,
+      stationID: selectedDevice,
       boardNumber:selectedBoard,
       startDate: start.toJSON(),
       endDate: end.toJSON(),
     };
-    axios.post(`${appsetting.BaseApiUrl}/api/device/data/board/excel`, dto,
+    axios.post(`/api/device/data/board/excel`, dto,
         {
             headers:
             {
@@ -117,7 +115,7 @@ let select=(val)=>{
 };
 let getStation = () => {
   axios
-    .get(`${appsetting.BaseApiUrl}/api/device/boards/detail`)
+    .get(`/api/device/boards/detail`)
     .then(function (response) {
       setDevices(response.data);
       console.log(response.data);
@@ -140,17 +138,18 @@ let getStation = () => {
             <div className="row">
               <div className="col-12 col-md-6">
                 <p>پست را انتخاب کنید</p>
-                <select
+                <SearchSelect items={devices} onSelect={(d)=>select(d.stationID + "-" + d.boardNumber)} textField="name" placeholder="نام ایستگاه را وارد کنید" ></SearchSelect>
+                {/* <select
                   className="form-control"
                   onChange={(e) => select(e.target.value)}
                 >
                   <option>پست را انتخاب کنید</option>
                   {devices.map((d) => (
                     <>
-                      <option value={d.serial+'-'+d.boardNumber}>{d.name}</option>
+                      <option value={d.stationID+'-'+d.boardNumber}>{d.name}</option>
                     </>
                   ))}
-                </select>
+                </select> */}
               </div>
               <div className="col-md-6 col-12">
                 <p> بازه زمانی را انتخاب کنید</p>
@@ -182,19 +181,48 @@ let getStation = () => {
                 نمودار لحظه ای مجموع توان
               </div>
               <div className="card-body chart">
-                <LineChart
-                  width={chartWith}
-                  height={450}
-                  data={chartData}
-                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-                >
-                  <Line type="monotone" dataKey="pa" name="توان"  stroke="#8884d8" />
-                  <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                  <Brush dataKey="dateText" height={30} stroke="#8884d8" />
-                  <XAxis dataKey="dateText" />
-                  <YAxis />
-                  <Tooltip />
-                </LineChart>
+                {chartData.length>0?<>
+
+                  <div dir="ltr" style={{ height: 450, width: "100%" }}>
+                            <ResponsiveContainer width={"100%"} height={"100%"}>
+                              <LineChart
+                                data={chartData}
+                                margin={{
+                                  top: 5,
+                                  right: 20,
+                                  bottom: 5,
+                                  left: 0,
+                                }}
+                              >
+                                <CartesianGrid
+                                  stroke="#ccc"
+                                  strokeDasharray="5 5"
+                                />
+                                <XAxis dataKey="dateText">
+                                  <Label offset={30} position="left">زمان</Label>
+                                </XAxis>
+
+                                <YAxis tickCount={20}>
+                                  <Label position="center" angle={-90} dx={-20}>
+                                    توان(KW)
+                                  </Label>
+                                </YAxis>
+                                <Line
+                                  type="monotone"
+                                  dataKey="power"
+                                  name="توان"
+                                  unit="kw"
+                                  stroke="#8884d8"
+                                />
+                                <Tooltip />
+                                <Brush dataKey="dateText"></Brush>
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
+                </>:<>
+                <p>داده ای در این بازه زمانی یافت نشد</p>
+                </>}
+                
               </div>
             </div>
           </>

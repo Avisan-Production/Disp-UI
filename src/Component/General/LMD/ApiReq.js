@@ -6,7 +6,7 @@ import axios from 'axios'
   GetBoardsDetail() {
     var res = [];
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/all`, {
+      .get(`/api/device/all`, {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
@@ -21,7 +21,7 @@ import axios from 'axios'
   }
   GetBoardsData(){
     var res=[];
-    axios.get(`${appsetting.BaseApiUrl}/api/device/data/0`,{
+    axios.get(`/api/device/data/0`,{
         headers:{
           'Access-Control-Allow-Origin':'*',
           'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',

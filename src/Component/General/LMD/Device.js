@@ -20,6 +20,7 @@ function Device() {
   const [modal, setModal] = useState(false);
   const [device, setDevice] = useState({});
   const [boards, setBoards] = useState([]);
+  const [deviceserial, setSerial] = useState(0);
   const [faName, setFaName] = useState("");
   const [enName, setEnName] = useState("");
   const [lat, setLat] = useState(0.0);
@@ -28,6 +29,7 @@ function Device() {
   const [installationDate, setInstall] = useState("");
   const [simCardNumber, setSimcardNumber] = useState("");
   const [description, setDescription] = useState("");
+  const [destinationUrl, setDestinationUrl] = useState("");
   // boards states
   const [boardName, setBoardName] = useState("");
   const [boardNumber, setBoardNumber] = useState(0);
@@ -39,280 +41,271 @@ function Device() {
   const [boardShow, setBoardShow] = useState(false);
   const [isAdd, setIsAdd] = useState(true);
 
-const [apnDomain,SetDomain]=useState("test.avisaniot.ir");
-const [apnRoom,SetRoom]=useState("api/device/t");
-const [apnPort,SetPort]=useState(80);
-const [devCommand,SetCommand]=useState("");
+  const [apnDomain, SetDomain] = useState("test.avisaniot.ir");
+  const [apnRoom, SetRoom] = useState("api/device/t");
+  const [apnPort, SetPort] = useState(80);
+  const [devCommand, SetCommand] = useState("");
 
-const [files,SetFiles]=useState([]);
+  const [files, SetFiles] = useState([]);
 
-const [contacts,SetContacts]=useState([]);
-const [ContactName,SetContactName]=useState("");
-const [ContactNumber,SetContactNumber]=useState("");
+  const [contacts, SetContacts] = useState([]);
+  const [ContactName, SetContactName] = useState("");
+  const [ContactNumber, SetContactNumber] = useState("");
 
   const navigator = useNavigate();
-  let cntRow=0;
+  let cntRow = 0;
 
-  let SendCommand=()=>{
-    if(window.confirm('آیا از ارسال دستور مطمئن هستید؟')){
-      var dto={
-        serial:serial,
-        command:devCommand
+  let SendCommand = () => {
+    if (window.confirm("آیا از ارسال دستور مطمئن هستید؟")) {
+      var dto = {
+        serial: serial,
+        command: devCommand,
+      };
+      axios
+        .post(`/api/command/console`, dto)
+        .then((res) => {
+          setToast({
+            show: true,
+            title: "کنسول",
+            text: "دستور ثبت شده است",
+            bg: "success",
+          });
+          SetCommand("");
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "کنسول",
+            text: "در ثبت دستور خطا رخ داده است",
+            bg: "danger",
+          });
+        });
+    }
+  };
+  let handleDocSubmit = (e) => {
+    e.preventDefault();
+    if (window.confirm("آیا از ارسال فایل مستندات مطمئن هستید؟")) {
+      var formData = new FormData();
+      debugger;
+      var imagefiles = document.getElementById("DocumentsFileUpload").files;
+      formData.append("serial", serial);
+      for (var item of imagefiles) {
+        formData.append("files", item);
       }
       axios
-      .post(`${appsetting.BaseApiUrl}/api/command/console`,dto)
-      .then((res) => {
-       
-        setToast({
-          show: true,
-          title: "کنسول",
-          text: "دستور ثبت شده است",
-          bg: "success",
+        .post(`/api/device/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          getFiles();
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "مستندات",
+            text: "در آپلود فایل مستندات خطا رخ داده است",
+            bg: "danger",
+          });
         });
-        SetCommand('');
-        
+    }
+  };
+  let removeFiles = (url) => {
+    if (window.confirm("آیا از حذف مستند مطمئن هستید ؟")) {
+      var dto = { stationID: parseInt(serial), fileName: url };
+      axios
+        .post(`/api/device/files/remove`, dto)
+        .then((res) => {
+          setToast({
+            show: true,
+            title: "مستندات",
+            text: "فایل مستندات با موفقیت حذف شد",
+            bg: "success",
+          });
+          getFiles()
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "مستندات",
+            text: "در حذف فایل مستندات خطا رخ داده است",
+            bg: "danger",
+          });
+        });
+    }
+  };
+  let getFiles = () => {
+    axios
+      .get(`/api/device/files/${serial}`)
+      .then((res) => {
+        SetFiles(res.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "کنسول",
-          text: "در ثبت دستور خطا رخ داده است",
-          bg: "danger",
-        });
+        
       });
-
-    }
-  }
-let handleDocSubmit=(e)=>{
-  e.preventDefault();
-  if(window.confirm("آیا از ارسال فایل مستندات مطمئن هستید؟")){
-    var formData = new FormData();
-    debugger;
-    var imagefiles = document.getElementById("DocumentsFileUpload").files
-    formData.append("serial", serial);
-    for(var item of imagefiles){
-      
-      formData.append("files", item);
-    }
-    axios.post(`${appsetting.BaseApiUrl}/api/device/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-    })
-    .then((res)=>{
-      getFiles()
-    })
-    .catch((err)=>{
-      setToast({
-        show: true,
-        title: "مستندات",
-        text: "در آپلود فایل مستندات خطا رخ داده است",
-        bg: "danger",
-      });      
-    })
-  }
-  
-}
-let removeFiles=(url)=>{
-  if(window.confirm('آیا از حذف مستند مطمئن هستید ؟')){
-  var dto={serial:serial,fileName:url}
+  };
+  let getContacts = () => {
     axios
-    .post(`${appsetting.BaseApiUrl}/api/device/files/remove`,dto)
-    .then((res) => {
-      setToast({
-        show: true,
-        title: "مستندات",
-        text: "فایل مستندات با موفقیت حذف شد",
-        bg: "success",
-      });
-     SetFiles(res.data);
-    })
-    .catch((err) => {
-      setToast({
-        show: true,
-        title: "مستندات",
-        text: "در حذف فایل مستندات خطا رخ داده است",
-        bg: "danger",
-      });
-    });  
-  }
-  
-}
-let getFiles=()=>{
-  axios
-  .get(`${appsetting.BaseApiUrl}/api/device/files/${serial}`)
-  .then((res) => {
-   SetFiles(res.data);
-  })
-  .catch((err) => {
-    setToast({
-      show: true,
-      title: "مستندات",
-      text: "در واکشی لیست مستندات خطا رخ داده است",
-      bg: "danger",
-    });
-  });
-}
-  let getContacts=()=>{
-    axios
-    .get(`${appsetting.BaseApiUrl}/api/device/contact/${serial}`)
-    .then((res) => {
-     SetContacts(res.data);
-    })
-    .catch((err) => {
-      setToast({
-        show: true,
-        title: "لیست مخاطبین",
-        text: "در واکشی لیست مخاطبین خطا رخ داده است",
-        bg: "danger",
-      });
-    });
-  }
-  let Addcontact=()=>{
-    if(window.confirm('آیا از افزودن مخاطب مطمئن هستید')){
-    var dto={
-      id:0,
-      deviceSerial:serial,
-      name:ContactName,
-      number:ContactNumber
-    }
-    axios
-    .post(`${appsetting.BaseApiUrl}/api/device/contact/`,dto)
-    .then((res) => {
-      setToast({
-        show: true,
-        title: "مخاطبین",
-        text: "مخاطب با موفقیت افزوده شد",
-        bg: "success",
-      });
-      getContacts();
-    })
-    .catch((err) => {
-      setToast({
-        show: true,
-        title: "لیست مخاطبین",
-        text: "در ثبت مخاطب خطا رخ داده است",
-        bg: "danger",
-      });
-    });
-  }
-  }
-  let RemoveContact=(cnt)=>{
-    if(window.confirm('آیا از حذف مخاطب مطمئن هستید')){
-      axios
-      .post(`${appsetting.BaseApiUrl}/api/device/contact/remove`,cnt)
+      .get(`/api/device/contact/${serial}`)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "مخاطبین",
-          text: "مخاطب با موفقیت حذف شد",
-          bg: "success",
-        });
-        getContacts();
+        SetContacts(res.data);
       })
       .catch((err) => {
         setToast({
           show: true,
           title: "لیست مخاطبین",
-          text: "در حذف مخاطب خطا رخ داده است",
+          text: "در واکشی لیست مخاطبین خطا رخ داده است",
           bg: "danger",
         });
       });
+  };
+  let Addcontact = () => {
+    if (window.confirm("آیا از افزودن مخاطب مطمئن هستید")) {
+      var dto = {
+        id: 0,
+        stationID: serial,
+        name: ContactName,
+        number: ContactNumber,
+      };
+      axios
+        .post(`/api/device/contact/`, dto)
+        .then((res) => {
+          setToast({
+            show: true,
+            title: "مخاطبین",
+            text: "مخاطب با موفقیت افزوده شد",
+            bg: "success",
+          });
+          getContacts();
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "لیست مخاطبین",
+            text: "در ثبت مخاطب خطا رخ داده است",
+            bg: "danger",
+          });
+        });
     }
-  }
+  };
+  let RemoveContact = (cnt) => {
+    if (window.confirm("آیا از حذف مخاطب مطمئن هستید")) {
+      axios
+        .post(`/api/device/contact/remove`, cnt)
+        .then((res) => {
+          setToast({
+            show: true,
+            title: "مخاطبین",
+            text: "مخاطب با موفقیت حذف شد",
+            bg: "success",
+          });
+          getContacts();
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "لیست مخاطبین",
+            text: "در حذف مخاطب خطا رخ داده است",
+            bg: "danger",
+          });
+        });
+    }
+  };
   let SelectBoard = (board) => {
     setBoardName(board.name);
     setBoardNumber(board.boardNumber);
     setBoardNominalPower(board.nominalPower);
     setBoardType(board.type);
     setBoardis3Phase(board.is3Phase);
-    setBoardTotalLights(board.totalLights)
-    setBoardLightPower(board.lightPower)
+    setBoardTotalLights(board.totalLights);
+    setBoardLightPower(board.lightPower);
     setBoardShow(board.show);
-    setIsAdd(false)
-    setModal(true)
-    
+    setIsAdd(false);
+    setModal(true);
   };
-  let resetStates=()=>{
+  let resetStates = () => {
     setBoardName("");
     setBoardNumber(0);
     setBoardNominalPower(0);
     setBoardType(0);
     setBoardis3Phase(false);
-    setBoardTotalLights(0)
-    setBoardLightPower(0.0)
+    setBoardTotalLights(0);
+    setBoardLightPower(0.0);
     setBoardShow(false);
-    setIsAdd(true)
-  }
-  let submitBoard=()=>{
+    setIsAdd(true);
+  };
+  let submitBoard = () => {
     var dto = {
-      serial: serial,
+      StationID: serial,
       boardNumber: boardNumber,
       name: boardName,
       nominalPower: boardNominalPower,
       is3Phase: boardis3Phase,
-      type:boardType ,
-      totalLights:parseInt(boardTotalLights),
-      lightPower:parseFloat(boardLightPower),
-      show:boardShow
+      type: boardType,
+      totalLights: parseInt(boardTotalLights),
+      lightPower: parseFloat(boardLightPower),
+      show: boardShow,
     };
-    console.log(dto)
-    if(isAdd){
-        if(window.confirm('آیا از افزودن برد مطمئن هستید ؟ ')){
-            axios.post(`${appsetting.BaseApiUrl}/api/device/board`,dto)
-            .then((res) => {
-                setToast({
-                  show: true,
-                  title: "افزودن برد",
-                  text: res.data,
-                  bg: "success",
-                });
-                getBoards()
-                resetStates();
-                setModal(false)
-              })
-              .catch((err) => {
-                setToast({
-                  show: true,
-                  title: "افزودن برد",
-                  text: "در افزودن برد خطا رخ داده است",
-                  bg: "danger",
-                });
-               });
-        }
+    console.log(dto);
+    if (isAdd) {
+      if (window.confirm("آیا از افزودن برد مطمئن هستید ؟ ")) {
+        axios
+          .post(`/api/device/board`, dto)
+          .then((res) => {
+            setToast({
+              show: true,
+              title: "افزودن برد",
+              text: res.data,
+              bg: "success",
+            });
+            getBoards();
+            resetStates();
+            setModal(false);
+          })
+          .catch((err) => {
+            setToast({
+              show: true,
+              title: "افزودن برد",
+              text: err.response.data,
+              bg: "danger",
+            });
+          });
+      }
+    } else {
+      if (window.confirm("آیا از ویرایش برد مطمئن هستید ؟ ")) {
+        axios
+          .patch(`/api/device/board`, dto)
+          .then((res) => {
+            setToast({
+              show: true,
+              title: "ویرایش برد",
+              text: res.data,
+              bg: "success",
+            });
+            getBoards();
+            resetStates();
+            setModal(false);
+          })
+          .catch((err) => {
+            setToast({
+              show: true,
+              title: "ویرایش برد",
+              text: "در ویرایش برد خطا رخ داده است",
+              bg: "danger",
+            });
+          });
+      }
     }
-    else{
-        if(window.confirm('آیا از ویرایش برد مطمئن هستید ؟ ')){
-            axios.patch(`${appsetting.BaseApiUrl}/api/device/board`,dto)
-            .then((res) => {
-                setToast({
-                  show: true,
-                  title: "ویرایش برد",
-                  text: res.data,
-                  bg: "success",
-                });
-                getBoards()
-                resetStates();
-                setModal(false)
-              })
-              .catch((err) => {
-                setToast({
-                  show: true,
-                  title: "ویرایش برد",
-                  text: "در ویرایش برد خطا رخ داده است",
-                  bg: "danger",
-                });
-               });
-        }
-    }
-  }
+  };
   let removeBoard = (bn) => {
     if (window.confirm("آیا از حذف برد مطمئن هستید ؟")) {
-        var dto={
-          serial:serial,
-          board:bn
-        }
-        axios.post(`${appsetting.BaseApiUrl}/api/device/board/remove`,dto)
+      var dto = {
+        StationID: serial,
+        board: bn,
+      };
+      axios
+        .post(`/api/device/board/remove`, dto)
         .then((res) => {
           setToast({
             show: true,
@@ -332,45 +325,44 @@ let getFiles=()=>{
         });
     }
     getBoards();
-  }
-let ChangeApn=()=>{
-  if (window.confirm("آیا از تغییر API مطمئن هستید ؟")) {
-    var dto={
-      serial:serial,
-      cmd:21,
-      domain:apnDomain,
-      room:apnRoom,
-      port:parseInt( apnPort)
-    };
-    console.log(dto);
-    axios
-    .post(`${appsetting.BaseApiUrl}/api/command/request`,dto)
-    .then((res) => {
-      setToast({
-        show: true,
-        title: "تغییر API",
-        text: res.data,
-        bg: "success",
-      });
-    })
-    .catch((err) => {
-      setToast({
-        show: true,
-        title: "تغییر API",
-        text: "در تغییر API خطا رخ داده است",
-        bg: "danger",
-      });
-    });
-  }
-}
-
+  };
+  let ChangeApn = () => {
+    if (window.confirm("آیا از تغییر API مطمئن هستید ؟")) {
+      var dto = {
+        serial: serial,
+        cmd: 21,
+        domain: apnDomain,
+        room: apnRoom,
+        port: parseInt(apnPort),
+      };
+      console.log(dto);
+      axios
+        .post(`/api/command/request`, dto)
+        .then((res) => {
+          setToast({
+            show: true,
+            title: "تغییر API",
+            text: res.data,
+            bg: "success",
+          });
+        })
+        .catch((err) => {
+          setToast({
+            show: true,
+            title: "تغییر API",
+            text: "در تغییر API خطا رخ داده است",
+            bg: "danger",
+          });
+        });
+    }
+  };
   let removeDevice = () => {
     if (window.confirm("آیا از حذف دستگاه مطمئن هستید ؟")) {
-      var dto={
-        serial:serial
-      }
+      var dto = {
+        stationID: parseInt(serial),
+      };
       axios
-        .post(`${appsetting.BaseApiUrl}/api/device/remove`,dto)
+        .post(`/api/device/remove`, dto)
         .then((res) => {
           setToast({
             show: true,
@@ -392,10 +384,11 @@ let ChangeApn=()=>{
   };
   let getDevice = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/${serial}`)
+      .get(`/api/device/${serial}`)
       .then((response) => {
         console.log(response.data);
-        if (response.data != null || response.data != undefined) {
+        if (response.data != null || response.data !== undefined) {
+          setSerial(response.data.serial)
           setDevice(response.data);
           setFaName(response.data.deviceName);
           setEnName(response.data.englishName);
@@ -405,14 +398,16 @@ let ChangeApn=()=>{
           setActive(response.data.active);
           setInstall(response.data.installationDate);
           setDescription(response.data.description);
+          setDestinationUrl(response.data.destinationUrl);
         }
       })
       .catch((err) => {
-        console.log(err.data);
+        console.log(err.response.data);
       });
   };
   let editDevice = () => {
     let dto = {
+      StationID:serial,
       active: active,
       description: description,
       deviceName: faName,
@@ -420,12 +415,13 @@ let ChangeApn=()=>{
       installationDate: installationDate,
       latitude: lat,
       longitude: lon,
-      serial: serial,
+      serial: deviceserial,
       simCardNumber: simCardNumber,
-      type: 0
+      type: 0,
+      destinationUrl:destinationUrl
     };
     axios
-      .patch(`${appsetting.BaseApiUrl}/api/device/detail`, dto)
+      .patch(`/api/device/detail`, dto)
       .then((res) => {
         setToast({
           show: true,
@@ -439,23 +435,23 @@ let ChangeApn=()=>{
         setToast({
           show: true,
           title: "ویرایش دستگاه",
-          text: err.data,
+          text: err.response.data,
           bg: "danger",
         });
       });
   };
   let getBoards = () => {
     axios
-      .get(`${appsetting.BaseApiUrl}/api/device/boards/detail/${serial}`)
+      .get(`/api/device/boards/detail/${serial}`)
       .then((response) => {
         console.log(response.data);
         if (response.data !== null || response.data !== undefined) {
           setBoards(response.data);
-          console.log(response.data)
+          console.log(response.data);
         }
       })
       .catch((err) => {
-        console.log(err.data);
+        console.log(err.response.data);
       });
   };
 
@@ -463,7 +459,7 @@ let ChangeApn=()=>{
     getDevice();
     getBoards();
     getContacts();
-    getFiles()
+    getFiles();
   }, []);
 
   return (
@@ -485,9 +481,9 @@ let ChangeApn=()=>{
               <div className="mb-2">
                 <p>سریال</p>
                 <input
-                  type="text"
-                  value={device.serial}
-                  disabled
+                  type="number"
+                  value={deviceserial}
+                  onChange={(e) => setSerial(parseInt(e.target.value))}
                   className="form-control"
                 ></input>
               </div>
@@ -547,6 +543,15 @@ let ChangeApn=()=>{
                   className="form-control"
                   value={installationDate}
                   onChange={(e) => setInstall(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <p>آدرس APN مقصد :</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={destinationUrl}
+                  onChange={(e) => setDestinationUrl(e.target.value)}
                 />
               </div>
               <div className="mb-2">
@@ -683,7 +688,10 @@ let ChangeApn=()=>{
                         />
                       </div>
                       <div className="col-md-6 col-12 mb-2">
-                        <p>توان اسمی <small className="text-secondary">(KW)</small></p>
+                        <p>
+                          توان اسمی{" "}
+                          <small className="text-secondary">(KW)</small>
+                        </p>
                         <input
                           type="text"
                           className="form-control"
@@ -858,24 +866,39 @@ let ChangeApn=()=>{
               </form>
             </div>
             <div className="col-12 row mt-1">
-              {files.map((f)=>(
-              <>
-                <div className="col-12 col-md-3">
-                <div className="card">
-                  <img
-                    src={`${appsetting.BaseApiUrl}${f.fileName}`}
-                    style={{height:'150px'}}
-                    class="card-img-top"
-                    alt="مستندات"
-                  />
-                  <div class="card-body">
-                    <a   href={`${appsetting.BaseApiUrl}${f.fileName}`} className="btn btn-primary w-100" target="_blank"><FontAwesomeIcon icon={solid('magnifying-glass-plus')}/> {' | بزرگنمایی'} </a>
-                    <button className="btn btn-danger w-100 mt-1" onClick={()=>removeFiles(f.fileName)}><FontAwesomeIcon icon={solid('trash')} />{' | حذف'}</button>
+              {files.map((f) => (
+                <>
+                  <div className="col-12 col-md-3">
+                    <div className="card">
+                      <img
+                        src={`${appsetting.BaseApiUrl}${f.fileName}`}
+                        style={{ height: "150px" }}
+                        class="card-img-top"
+                        alt="مستندات"
+                      />
+                      <div class="card-body">
+                        <a
+                          href={`${f.fileName}`}
+                          className="btn btn-primary w-100"
+                          target="_blank"
+                        >
+                          <FontAwesomeIcon
+                            icon={solid("magnifying-glass-plus")}
+                          />{" "}
+                          {" | بزرگنمایی"}{" "}
+                        </a>
+                        <button
+                          className="btn btn-danger w-100 mt-1"
+                          onClick={() => removeFiles(f.fileName)}
+                        >
+                          <FontAwesomeIcon icon={solid("trash")} />
+                          {" | حذف"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              </>))}
-              
+                </>
+              ))}
             </div>
           </div>
         </div>
@@ -920,7 +943,9 @@ let ChangeApn=()=>{
           </div>
 
           <div className="mb-2">
-            <p>توان اسمی <small className="text-secondary">(KW)</small>:</p>
+            <p>
+              توان اسمی <small className="text-secondary">(KW)</small>:
+            </p>
             <input
               type="number"
               className="form-control"

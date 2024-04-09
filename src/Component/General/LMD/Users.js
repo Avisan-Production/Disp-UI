@@ -12,8 +12,12 @@ import ToastContainer from "react-bootstrap/ToastContainer";
 function Users(){
 const [users,setUsers]=useState([]);
 const [modal,setModal]=useState(false);
+const [passwordmodal,setPasswordModal]=useState(false);
 const [name,setName]=useState("");
 const [username,setUsername]=useState("");
+const [password,setPassword]=useState("");
+const [confirmPassword,setConfirmPassword]=useState("");
+
 const [tell,setTell]=useState("");
 const [type,setType]=useState(2);
 const [email,setEmail]=useState("");
@@ -83,6 +87,39 @@ var selectUser=(user)=>{
   setModal(true);
 }
 
+var openPasswordModal=(user)=>{
+setUsername(user.username);
+setPasswordModal(true)
+}
+
+const openModal=(state)=>{
+  if(state){
+    setPasswordModal(false);
+    setName("");
+    setUsername("");
+    setPassword("");
+    setConfirmPassword("");
+    setTell("");
+    setType(2);
+    setEmail("");
+    setCodeMelli("");
+    setActive(false);
+    setMode(false);
+    SetAccessList([]);
+    setstationAccess(false);
+    setturnOnOffAccess(false);
+    settimerAccess(false);
+    setgroupAccess(false);
+    setreportAccess(false);
+    seteventAccess(false);
+    setdashboardAccess(false);
+    setusersAccess(false);
+    setaddUserAccess(false);
+    setdeleteUserAccess(false);
+  }
+  setModal(true)
+}
+
 var submit=()=>{
     var dto= {
         FullName:name,
@@ -96,25 +133,28 @@ var submit=()=>{
     }
     console.log(dto);
    if(isUpdateMode){
-axios.patch(`${appsetting.BaseApiUrl}/api/user/update`,dto)
+axios.patch(`/api/user/update`,dto)
 .then((res)=>{
     setToast({show:true,title:'ویرایش کاربر',text:res.data,bg:'success'})
+   getUsers();
+
 })
 .catch((err)=>{
-    setToast({show:true,title:'ویرایش کاربر',text:err.data,bg:'danger'})
-    getUsers();
+    setToast({show:true,title:'ویرایش کاربر',text:err.response.data,bg:'danger'})
 });
    }
    else{
-    axios.post(`${appsetting.BaseApiUrl}/api/user/add`,dto)
+    dto["password"]=password;
+    axios.post(`/api/user/add`,dto)
     .then((res)=>{
         setToast({show:true,title:'افزودن کاربر',text:res.data,bg:'success'})
         getUsers();
     })
     .catch((err)=>{
-        setToast({show:true,title:'افزودن کاربر',text:err.data,bg:'danger'})
+        setToast({show:true,title:'افزودن کاربر',text:err.response.data,bg:'danger'})
     });
    } 
+
     setModal(false)
     setstationAccess(false);
     setturnOnOffAccess(false);
@@ -128,12 +168,32 @@ axios.patch(`${appsetting.BaseApiUrl}/api/user/update`,dto)
     setdeleteUserAccess(false);
     
 }
+var submitPassword=()=>{
+  if(password!==confirmPassword) return
+  var dto= {
+      Username : username,
+      Password : password
+
+  }
+  console.log(dto);
+ 
+  axios.patch(`/api/user/update/pwd`,dto)
+  .then((res)=>{
+      setToast({show:true,title:'ویرایش کلمه عبور',text:res.data,bg:'success'})
+      getUsers();
+      setPasswordModal(false)
+  })
+  .catch((err)=>{
+      setToast({show:true,title:'ویرایش کلمه عبور',text:err.response.data,bg:'danger'})
+  });
+ 
+}
 let removeUser=(username)=>{
   if(window.confirm('آیا از حذف کاربر مطمئن هستید ؟')){
     var dto={
       username:username
     }
-    axios.post(`${appsetting.BaseApiUrl}/api/user/remove`,dto).then((response)=>
+    axios.post(`/api/user/remove`,dto).then((response)=>
      {
         setToast({show:true,title:"حذف کاربر",text:response.data,bg:'success'})
 
@@ -146,13 +206,13 @@ let removeUser=(username)=>{
 }
 let getUsers=()=>{
  
-    axios.get(`${appsetting.BaseApiUrl}/api/user/all`).then((response)=>
+    axios.get(`/api/user/all`).then((response)=>
      {
         console.log(response.data)
         setUsers(response.data)
      })
      .catch((err)=>{
-        console.log(err.data)
+        console.log(err.response.data)
      })
 }
 useEffect(()=>{
@@ -171,7 +231,7 @@ useEffect(()=>{
               <button
                 className="btn btn-success mt-auto mb-auto"
                 style={{ marginLeft: "5px !important", marginRight: "auto" }}
-                onClick={() => setModal(true)}
+                onClick={() => openModal(true)}
               >
                 افزودن کاربر جدید
               </button>
@@ -206,11 +266,20 @@ useEffect(()=>{
                             : "کاربر ساده"}
                         </td>
                         <td className="d-flex justify-content-between">
-                        <button
+                          <button
                             className="btn-none"
                             onClick={() => removeUser(x.username)}
                           >
-                            <FontAwesomeIcon className="text-danger" icon={solid("trash")} />
+                            <FontAwesomeIcon
+                              className="text-danger"
+                              icon={solid("trash")}
+                            />
+                          </button>
+                          <button
+                            className="btn-none"
+                            onClick={() => openPasswordModal(x)}
+                          >
+                            <FontAwesomeIcon icon={solid("key")} />
                           </button>
                           <button
                             className="btn-none"
@@ -259,6 +328,19 @@ useEffect(()=>{
                 onChange={(e) => setUsername(e.target.value)}
               ></input>
             </div>
+            {
+              !isUpdateMode&&<>
+                <div>
+              <p>کلمه عبور</p>
+              <input
+                className="form-control"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              ></input>
+            </div>
+              </>
+            }
             <div>
               <p>پست الکترونیک</p>
               <input
@@ -308,7 +390,7 @@ useEffect(()=>{
             <hr />
             <div>
               <p>دسترسی ها</p>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -319,12 +401,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked0" 
+                  htmlFor="flexSwitchCheckChecked0"
                 >
                   مدیریت ایستگاه ها
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -335,12 +417,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked1" 
+                  htmlFor="flexSwitchCheckChecked1"
                 >
                   درخواست وصل یا قطع
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -351,12 +433,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked2" 
+                  htmlFor="flexSwitchCheckChecked2"
                 >
-                    درخواست تایمر
+                  درخواست تایمر
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -367,12 +449,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked3" 
+                  htmlFor="flexSwitchCheckChecked3"
                 >
                   مدیریت محور
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -383,12 +465,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked4" 
+                  htmlFor="flexSwitchCheckChecked4"
                 >
                   گزارشگیری
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -399,12 +481,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked5" 
+                  htmlFor="flexSwitchCheckChecked5"
                 >
                   رویداد ها
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -415,12 +497,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked6" 
+                  htmlFor="flexSwitchCheckChecked6"
                 >
-                   داشبورد
+                  داشبورد
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -431,12 +513,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked7" 
+                  htmlFor="flexSwitchCheckChecked7"
                 >
                   مدیریت کاربران
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -447,12 +529,12 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked8" 
+                  htmlFor="flexSwitchCheckChecked8"
                 >
                   افزودن کاربر
                 </label>
               </div>
-              <div className="form-check form-switch" >
+              <div className="form-check form-switch">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -463,7 +545,7 @@ useEffect(()=>{
                 />
                 <label
                   className="form-check-label"
-                  htmlFor="flexSwitchCheckChecked9" 
+                  htmlFor="flexSwitchCheckChecked9"
                 >
                   حذف کاربر
                 </label>
@@ -479,19 +561,58 @@ useEffect(()=>{
             </Button>
           </Modal.Footer>
         </Modal>
-        <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000} 
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
 
+        <Modal show={passwordmodal}>
+          <Modal.Header>
+            <Modal.Title>تغییر کلمه عبور</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div>
+              <p>کلمه عبور را وارد کنید</p>
+              <input
+                className="form-control"
+                autoComplete={false}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              ></input>
+            </div>
+            <div>
+              <p >تکرار کلمه عبور را وارد کنید</p>
+              <input
+                className="form-control"
+                type="password"
+                autoComplete={false}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              ></input>
+            </div>
+            {password.length>0&&confirmPassword.length>0&&password!==confirmPassword&&<>
+            
+            <p className="text-danger mt-3">کلمه عبور و تکرار آن باید یکسان باشد</p>
+            </>}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" disabled={password===""||confirmPassword===""||password!==confirmPassword} onClick={() => submitPassword()}>
+              تغییر کلمه عبور
+            </Button>
+            <Button variant="secondary"  onClick={() => setPasswordModal(false)}>
+              بستن
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <ToastContainer className="position-fixed m-3" position="top-start">
+          <Toast
+            onClose={() =>
+              setToast({ show: false, title: "", text: "", bg: "" })
+            }
+            show={toast.show}
+            bg={toast.bg}
+            delay={3000}
+            autohide
+          >
+            <Toast.Header>{toast.title}</Toast.Header>
+            <Toast.Body>{toast.text}</Toast.Body>
+          </Toast>
+        </ToastContainer>
       </>
     );
 

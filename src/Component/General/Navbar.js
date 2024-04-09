@@ -10,7 +10,7 @@ const Navbar = (props) => {
     var rToken = localStorage.getItem("refreshtoken");
     var dto = { token: rToken };
     axios
-      .post(`${appsetting.BaseApiUrl}/api/user/signout`, dto)
+      .post(`/api/user/signout`, dto)
       .then(function (response) {
         localStorage.removeItem("token");
         localStorage.removeItem("refreshtoken");

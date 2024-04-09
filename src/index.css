@@ -119,3 +119,11 @@ flex-direction: row-reverse;
 
 .hover{opacity: 0.6; transition-duration: .5s;}
 .hover:hover{opacity:1;transition-duration: .5s;}
+
+div:has(> div.range-picker){
+  top: 0 !important;
+}
+.top-imp
+{
+  top: 0 !important;
+}

@@ -22,7 +22,7 @@ function Profile(){
       });
       const navigate=useNavigate();
     let GetUser=()=>{
-        axios.get(`${appsetting.BaseApiUrl}/api/user`)
+        axios.get(`/api/user`)
         .then((res)=>{
             console.log(res.data);
             SetName(res.data.fullName)
@@ -47,7 +47,7 @@ function Profile(){
                 username:currentUsername,
                 newusername:username,
             }
-            axios.patch(`${appsetting.BaseApiUrl}/api/user/update/profile`,dto)
+            axios.patch(`/api/user/update/profile`,dto)
             .then((res)=>{
                 console.log(res.data);
                 setToast({show:true,title:'پروفایل',text:res.data,bg:'success'})
@@ -69,7 +69,7 @@ function Profile(){
                 username:currentUsername,
                  password:newPass
             }
-            axios.patch(`${appsetting.BaseApiUrl}/api/user/update/pwd`,dto)
+            axios.patch(`/api/user/update/pwd`,dto)
             .then((res)=>{
                 console.log(res.data);
                 setToast({show:true,title:'پروفایل',text:res.data,bg:'success'})

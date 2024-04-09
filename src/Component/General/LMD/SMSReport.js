@@ -19,7 +19,7 @@ function SMSReport() {
     date.setMinutes(0);
     date.setSeconds(0);
     axios
-      .get(`${appsetting.BaseApiUrl}/api/sms/report/${date.toJSON()}`)
+      .get(`/api/sms/report/${date.toJSON()}`)
       .then((res) => {
         console.log(res.data);
         setReport(res.data);
