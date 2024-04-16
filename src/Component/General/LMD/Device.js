@@ -243,8 +243,8 @@ function Device() {
       nominalPower: boardNominalPower,
       is3Phase: boardis3Phase,
       type: boardType,
-      totalLights: parseInt(boardTotalLights),
-      lightPower: parseFloat(boardLightPower),
+      // totalLights: parseInt(boardTotalLights),
+      // lightPower: parseFloat(boardLightPower),
       show: boardShow,
     };
     console.log(dto);
