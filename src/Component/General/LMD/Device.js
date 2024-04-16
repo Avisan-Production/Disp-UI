@@ -163,7 +163,6 @@ function Device() {
   let Addcontact = () => {
     if (window.confirm("آیا از افزودن مخاطب مطمئن هستید")) {
       var dto = {
-        id: 0,
         stationID: serial,
         name: ContactName,
         number: ContactNumber,
@@ -1008,7 +1007,7 @@ function Device() {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ToastContainer className="position-fixed m-3" position="top-start">
+      <ToastContainer className="position-fixed m-3" >
         <Toast
           onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
           show={toast.show}

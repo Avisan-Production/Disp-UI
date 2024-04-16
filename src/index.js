@@ -23,6 +23,7 @@ import SMSReport from './Component/General/LMD/SMSReport';
 import appsettings from './appsettings.json'
 import MapPage from './Component/General/LMD/MapPage';
 import Setting from './Component/General/Setting';
+import Management from './Component/General/LMD/Management';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 let theme=localStorage.getItem('theme')
@@ -99,6 +100,7 @@ const router = createBrowserRouter([
       {path:"/profile",element:<Profile />},
       {path:"/map",element:<MapPage />},
       {path:"/setting",element:<Setting />},
+      {path:"/managment",element:<Management />},
     ]
   }
   
