@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Label,
-  BarChart,
+  BarChart,PieChart,Pie,Cell,
   Bar,
 } from "recharts";
 export default function Management() {
@@ -65,79 +65,29 @@ export default function Management() {
       dateText: "11:15",
     },
   ];
-  const data = [
-    {
-      name: "سهروردی",
-      power: 1232,
-    },
-    {
-      name: "17 شهریور",
-      power: 1415,
-    },
-    {
-      name: "دانشگاه",
-      power: 1222,
-    },
-    {
-      name: "فردوسی",
-      power: 6532,
-    },
-    {
-      name: "قدس",
-      power: 4253,
-    },
-    {
-      name: "نارمک",
-      power: 1564,
-    },
-    {
-      name: "سهروردی",
-      power: 1232,
-    },
-    {
-      name: "17 شهریور",
-      power: 1415,
-    },
-    {
-      name: "دانشگاه",
-      power: 1222,
-    },
-    {
-      name: "فردوسی",
-      power: 6532,
-    },
-    {
-      name: "قدس",
-      power: 4253,
-    },
-    {
-      name: "نارمک",
-      power: 1564,
-    },  {
-        name: "سهروردی",
-        power: 1232,
-      },
-      {
-        name: "17 شهریور",
-        power: 1415,
-      },
-      {
-        name: "دانشگاه",
-        power: 1222,
-      },
-      {
-        name: "فردوسی",
-        power: 6532,
-      },
-      {
-        name: "قدس",
-        power: 4253,
-      },
-      {
-        name: "نارمک",
-        power: 1564,
-      },
-  ];
+ 
+const data = [
+  { name: '270 ایستگاه فعال', value: 60 },
+  { name: '3200 کیلووات همکاری', value: 170 },
+  { name: '13 منطقه برق', value: 50 },
+  { name: '1200 کیلو وات توان مصرفی', value: 140 },
+];
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={'middle'} dominantBaseline="central">
+      {data[index].name}
+    </text>
+  );
+};
+
   const getHeight = (id) => {
     let elem = document.getElementById(id);
     return elem ? elem.offsetHeight : 0;
@@ -216,83 +166,25 @@ export default function Management() {
             </div>
           </div>
         </div>
-        <div className="box box-mid">
-          <div className="h-half-1" id="powerchart">
-            <p className="mb-1 font-12">
-              نمودار لحظه ای توان مصرفی یکساعت گذشته
-            </p>
-            <div
-              dir="ltr"
-              style={{ height: getHeight("powerchart") - 40, width: "100%" }}
-            >
-              <ResponsiveContainer width={"100%"} height={"100%"}>
-                <LineChart
-                  data={chartData}
-                  margin={{
-                    top: 5,
-                    right: 20,
-                    bottom: 5,
-                    left: 0,
-                  }}
-                >
-                  <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                  <XAxis dataKey="dateText" fontSize={14} tickCount={12}>
-                    <Label position="left" fontSize={12} dx={-20}>
-                      زمان
-                    </Label>
-                  </XAxis>
-
-                  <YAxis tickCount={20} fontSize={12} tick={20}>
-                    <Label position="center" fontSize={12} angle={-90} dx={-20}>
-                      توان(KW)
-                    </Label>
-                  </YAxis>
-                  <Line
-                    type="monotone"
-                    dataKey="power"
-                    name="توان"
-                    unit="kw"
-                    stroke="#8884d8"
-                  />
-                  <Tooltip />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          <div id="groupschart" className="h-half-2">
-            <p className="mb-1 font-12">نمودار توان مصرفی گروه ها</p>
-            <div
-              dir="ltr"
-              style={{ height: getHeight("groupschart") - 40, width: "100%" }}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={data}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" fontSize={14} hide angle={-90}>
-                    <Label position="left" fontSize={13} dx={-20}>
-                      گروه
-                    </Label>
-                  </XAxis>
-
-                  <YAxis tickCount={20} fontSize={14}>
-                    <Label position="center" fontSize={13} angle={-90} dx={-40}>
-                      توان(KW)
-                    </Label>
-                  </YAxis>
-                  <Tooltip />
-                  <Bar dataKey="power" fill="#8884d8" shape={<CustomBar />} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+        <div id="midd" className="box box-mid">
+        <ResponsiveContainer width="100%" height="100%">
+        <PieChart width={getHeight('midd')} height={getHeight('midd')}>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            outerRadius={200}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+        </PieChart>
+      </ResponsiveContainer>
         </div>
         <div className="box" id="lightPie">
           <p className="mb-1 font-12">برترین های همکاری</p>

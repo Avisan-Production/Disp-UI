@@ -68,6 +68,10 @@ axios.interceptors.response.use(response => {
           error.config.headers.Authorization = `Bearer ${res.data.token}`
           return axios.request(error.config)
       })
+      .catch(()=>{
+        localStorage.clear();
+        window.location.href="/";
+      })
       
     }
     
