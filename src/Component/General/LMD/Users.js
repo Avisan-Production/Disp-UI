@@ -236,7 +236,7 @@ useEffect(()=>{
                 افزودن کاربر جدید
               </button>
             </div>
-            <div className="card-body chart">
+            <div className="card-body chart table-responsive">
               <table className="table table-hover table-bordered">
                 <thead>
                   <tr>

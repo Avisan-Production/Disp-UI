@@ -244,7 +244,7 @@ let openEditModal=(group)=>{
               افزودن گروه جدید
             </button>
           </div>
-          <div className="card-body">
+          <div className="card-body table-responsive">
             <table className="table  table-hovered">
               <thead>
                 <tr>

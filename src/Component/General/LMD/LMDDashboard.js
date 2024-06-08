@@ -401,6 +401,21 @@ remSerials(item.id,item.boardNumber)
 
   context.setSYSName("سامانه LMD");
 
+  const formatPowerValue=(val)=>{
+    if (val>1000000000000){
+      return (val/1000000000000).toFixed(2) + " PW"
+    }
+    if (val>1000000000){
+      return (val/1000000000).toFixed(2) + " TW"
+    }
+    if (val>1000000){
+      return (val/1000000).toFixed(2) + " GW"
+    }
+    if (val>1000){
+      return (val/1000).toFixed(2) + " MW"
+    }
+    return val.toFixed(2) + " KW"
+  }
   return (
     <>
       <div className="container mt-2 p-4">
@@ -438,9 +453,9 @@ remSerials(item.id,item.boardNumber)
                 </a>
               </li>
             </ul>
-            <div style={{ margin: "auto auto auto 5px" }}>
+            <div className="mt-3 dashboard_actions" style={{ margin: "auto auto auto 5px" }}>
               <button
-                className="float-left btn btn-primary"
+                className="btn btn-primary"
                 style={{ marginLeft: "5px" }}
                 onClick={() => setModal(true)}
               >
@@ -448,13 +463,13 @@ remSerials(item.id,item.boardNumber)
                 {" | "} ارسال پیامک
               </button>
               <button
-                className="float-left btn btn-success"
+                className=" btn btn-success"
                 onClick={turnOn}
                 style={{ marginRight: "auto", marginLeft: "5px" }}
               >
                 وصل {vocab.devices}
               </button>
-              <button className="float-left btn btn-danger" onClick={turnOff}>
+              <button className="btn btn-danger" onClick={turnOff}>
                 قطع {vocab.devices}
               </button>
             </div>
@@ -535,7 +550,7 @@ remSerials(item.id,item.boardNumber)
                       dir="ltr"
                       value={
                         dashInfo.totalActivePower !== undefined
-                          ? dashInfo.totalActivePower.toFixed(2) + " KW"
+                          ? formatPowerValue(dashInfo.totalActivePower)
                           : dashInfo.totalActivePower
                       }
                       disabled
@@ -545,7 +560,8 @@ remSerials(item.id,item.boardNumber)
                 <hr />
                 <br />
                 <p>تعداد {selectedDevices.length} ایستگاه انتخاب شده است</p>
-                <table className="table table-responsive  table-hover ">
+                <div className="table-responsive" >
+                <table className="table table-hover ">
                   <thead>
                     <tr>
                       <td>#</td>
@@ -722,6 +738,8 @@ remSerials(item.id,item.boardNumber)
                         ))}
                   </tbody>
                 </table>
+                </div>
+            
               </div>
               <div
                 className="tab-pane fade  active"

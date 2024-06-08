@@ -39,9 +39,9 @@ useEffect(()=>{
     <>
       <div className="container">
         <div className="card mt-4">
-          <div className="card-header bg-dark text-white d-flex justify-content-start">
+          <div className="card-header bg-dark text-white d-md-flex justify-content-start">
             <p className="m-auto me-0">گزارش پیامک های ارسال شده</p>
-            <div className="me-auto d-flex">
+            <div className="me-auto d-flex mt-2 mt-md-auto">
               <DatePicker onChange={(e) => setDate(e)} />
               <button
                 className="btn btn-success me-2"

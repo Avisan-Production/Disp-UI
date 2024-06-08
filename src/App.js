@@ -93,8 +93,7 @@ function App() {
           </a>
           {JwtToken && (
             <>
-              <ul className="navbar-nav" style={{ marginRight: "auto" }}>
-                <li className="nav-item">
+            
                   <div className="dropdown">
                     <button
                       className="nav-link active dropdown-toggle"
@@ -158,8 +157,7 @@ function App() {
                       </li>
                     </ul>
                   </div>
-                </li>
-                <li className="nav-item">
+                
                   <button
                     className="btn-none mt-auto mb-auto me-1 p-2 text-white"
                     style={{ fontSize: "1.1em" }}
@@ -181,8 +179,7 @@ function App() {
                       </>
                     )}
                   </button>
-                </li>
-              </ul>
+              
             </>
           )}
         </div>

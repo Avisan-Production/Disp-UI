@@ -185,3 +185,95 @@ div:has(> div.range-picker){
 .mng-container .form-control{
   padding: 11px
 }
+
+
+.dashboard_actions button{
+  float:left;
+}
+.station_actions button{
+  float: left;
+  margin:auto 5px ;
+}
+
+.station_chartselector{
+width: 60%;
+}
+.pass_input{
+  display: flex;
+  background-color: white;
+  border-radius: 8px;
+  padding-left: 5px;
+}
+.pass_input button{
+  margin: auto 5px;
+}
+.pass_input input{
+  border: 0;
+}
+.pass_input input:focus-visible{
+  border: none;
+  box-shadow: none;
+}
+.card-header-actions{
+  margin-right: auto;
+}
+.card-header-actions p{
+  margin-top: auto ;
+  margin-bottom: auto ;
+}
+.card-header-actions button{
+float: left;
+margin: auto 5px;
+}
+/* // Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+  .card-header-actions{
+    margin-top: 10px;
+  }
+  .card-header-actions button{
+    float: none;
+    width: 100%;
+    margin: 5px auto;
+    } 
+.dashboard_actions button{
+  float: none;
+  width: 100%;
+  margin-bottom: 3px;
+}
+.navbar-brand{
+  font-size: 12px;
+}
+.navbar-nav{
+  margin: 0;
+  padding: 0;
+  
+}
+.navbar-nav li{
+  float: left;
+}
+.dropdown li{
+  float: none;
+  width: 100%;
+  }
+  .station_actions {
+    width: 100%;
+  }
+  .station_actions button  {
+    float: none;
+    margin: 5px auto;
+    width: 100%;
+  }
+  .station_actions button:first-child{
+    margin-top: 20px;
+  }
+  .station_chartselector{
+    width: 100%;
+    margin-top: 10px;
+  }
+ }
+ 
+
+/* // Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) { 
+  
+ }

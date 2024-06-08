@@ -135,22 +135,24 @@ useEffect(()=>{
       <>
         <div className="container mt-4">
           <div className="card mt-5">
-            <div className="card-header bg-dark text-white d-flex justify-content-start">
-              لیست دستگاه ها
+            <div className="card-header bg-dark text-white d-md-flex justify-content-start">
+              <p className="my-auto">لیست دستگاه ها</p>
+
+              <div className="card-header-actions">
               <button
-                className="btn btn-success mt-auto mb-auto"
-                style={{ marginLeft: "5px !important", marginRight: "auto" }}
+                className="btn btn-success "
                 onClick={() => setModal(true)}
               >
                 افزودن دستگاه جدید
               </button>
               <button
-                className="btn btn-secondary mt-auto mb-auto"
-                style={{ marginLeft: "5px !important", marginRight: "5px" }}
+                className="btn btn-secondary "
                 onClick={() => fetchTimers()}
               >
               واکشی تایمر ها
               </button>
+              </div>
+              
             </div>
             <div className="card-body">
               <div className="col-12 d-md-flex justify-content-start">
@@ -160,6 +162,8 @@ useEffect(()=>{
               <br/>
               <hr/>
               <br/>
+              <div className="table-responsive">
+
               <table className="table table-hover">
                 <thead>
                   <tr>
@@ -203,6 +207,7 @@ useEffect(()=>{
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>

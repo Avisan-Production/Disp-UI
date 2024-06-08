@@ -3,6 +3,8 @@ import bg from "../../Assets/images/login-bg.jpg";
 import { useEffect, useState } from "react";
 import appsetting from '../../appsettings.json'
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -34,7 +36,9 @@ const Login = () => {
     }
     // context.setJwtToken("a");
     // navigate("/dashboard");
+
   };
+  const [show,setShow]=useState(false)
   return (
     <>
       <div
@@ -81,11 +85,23 @@ const Login = () => {
                 </div>
                 <div className="col-12 mb-3">
                   <p>کلمه عبور را وارد کنید</p>
+                  <div className="pass_input">
                   <input
                     className="form-control"
                     onChange={(event) => setPassword(event.target.value)}
-                    type="password"
+                    type={show?"text":"password"}
                   ></input>
+                  <button className="btn-none" onClick={()=>setShow(!show)}>
+                    {show?<>
+                    <FontAwesomeIcon icon={solid('eye-slash')}/>
+                    </>:
+                    <>
+                    <FontAwesomeIcon icon={solid('eye')} />
+                    </>
+                    }
+                  </button>
+                  </div>
+                  
                 </div>
 
                 <div className="col-12 mb-3 d-flex justify-content-center">

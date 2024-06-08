@@ -521,7 +521,8 @@ const [contacts,SetContacts]=useState([]);
         <div className="row">
           <div className="col-12 col-md-8">
             <div className="card">
-              <div className="card-header w-100 bg-black text-white mb-2 d-flex justify-content-start p-2">
+              <div className="card-header w-100 bg-black text-white mb-2 d-md-flex justify-content-start p-2">
+                <div className="station_detail d-flex">
                 <span
                   className={`mt-auto mb-auto updater-connection ${
                     device.isConnected ? "connected" : "disconnected"
@@ -533,9 +534,11 @@ const [contacts,SetContacts]=useState([]);
                 >
                   ایستگاه {device.name}
                 </p>
+                </div>
+                
+                <div className="station_actions">
                 <button
-                  className="float-left btn btn-primary"
-                  style={{ marginLeft: "5px" }}
+                  className=" btn btn-primary"
                   onClick={() => setSMSModal(true)}
                 >
                   <FontAwesomeIcon icon={solid("envelope")} />
@@ -544,7 +547,6 @@ const [contacts,SetContacts]=useState([]);
                 <button
                   className="btn btn-danger"
                   onClick={() => RelayRequest(12, 0)}
-                  style={{ marginLeft: "10px" }}
                 >
                   قطع همه
                 </button>
@@ -554,6 +556,8 @@ const [contacts,SetContacts]=useState([]);
                 >
                   وصل همه
                 </button>
+                </div>
+                
               </div>
               <div className="card-body">
                 <div className="row">
@@ -711,7 +715,9 @@ const [contacts,SetContacts]=useState([]);
                             ></input>
                           </div>
                         </div>
-                        <div className="mt-2 col-8">
+
+
+                        <div className="mt-2 col-md-8 col-12">
                           <p>نوع</p>
                           <input
                             className="form-control"
@@ -723,9 +729,9 @@ const [contacts,SetContacts]=useState([]);
                             disabled
                           ></input>
                         </div>
-                        <div className="col-4">
+                        <div className="col-12 col-md-4">
                           <button
-                            className="btn btn-primary mt-5"
+                            className="btn btn-primary mt-md-5 mt-2 w-100"
                             onClick={() => setExtra(b.detail)}
                           >
                             <FontAwesomeIcon icon={solid("eye")} />
@@ -741,9 +747,9 @@ const [contacts,SetContacts]=useState([]);
             {device.name !== undefined && (
               <>
                 <div className="card mt-5">
-                  <div className="card-header bg-dark text-white d-flex justify-content-start">
+                  <div className="card-header bg-dark text-white d-md-flex justify-content-start">
                     <p className="mt-auto mb-auto"> نمودار لحظه ای توان</p>
-                    <div className=" me-auto d-flex justify-content-start w-50">
+                    <div className=" me-auto d-flex justify-content-start  station_chartselector">
                       <select
                         className="form-control m-auto"
                         onChange={(e) =>
