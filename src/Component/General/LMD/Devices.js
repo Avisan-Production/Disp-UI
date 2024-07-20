@@ -8,10 +8,10 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { toast } from "react-toastify";
 
 function Devices(){
 
-const [toast, setToast] = useState({show: false,title: "",text: "",bg: ""});
 const [modal,setModal]=useState(false);
 const [devices,setDevices]=useState([]);
 const [search,setSearch]=useState([]);
@@ -50,10 +50,10 @@ let fetchTimers=()=>{
   if(window.confirm("آیا از ارسال درخواست واکشی تایمر مطمئن هستید ؟")){
     axios.post(`/api/command/request/timers`)
     .then((res)=>{
-        setToast({show:true,title:"واکشی تایمر",text:res.data,bg:"success"})
+        toast(res.data,{type:"success"})
     })
     .catch((err)=>{
-        setToast({show:true,title:"واکشی تایمر",text:"در ثبت درخواست واکشی تایمر خطا رخ داده است",bg:"danger"})
+        toast("در ثبت درخواست واکشی تایمر خطا رخ داده است",{type:"danger"})
     })
   }
 }
@@ -73,13 +73,13 @@ let addDevice=()=>{
         };
         axios.post(`/api/device/add`,dto)
         .then((res)=>{
-            setToast({show:true,title:"افزودن دستگاه",text:res.data,bg:"success"})
+            toast(res.data,{type:"success"})
             getDevices();
             resetStates();
             setModal(false)
         })
         .catch((err)=>{
-            setToast({show:true,title:"افزودن دستگاه",text:err.response.data,bg:"danger"})
+            toast(err.response.data,{type:"danger"})
         })
     }
             
@@ -93,20 +93,14 @@ let removeDevice=(serial)=>{
     axios
       .post(`/api/device/remove`,dto)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "حذف دستگاه",
-          text: res.data,
-          bg: "success",
+        toast(res.data,{
+         type: "success",
         });
         getDevices();
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "حذف دستگاه",
-          text: err.response.data,
-          bg: "danger",
+        toast(err.response.data,{
+          type: "danger",
         });
       });
   }
@@ -301,20 +295,7 @@ useEffect(()=>{
             </Button>
           </Modal.Footer>
         </Modal>
-        <ToastContainer className="position-fixed m-3" position="top-start">
-          <Toast
-            onClose={() =>
-              setToast({ show: false, title: "", text: "", bg: "" })
-            }
-            show={toast.show}
-            bg={toast.bg}
-            delay={3000} 
-            autohide
-          >
-            <Toast.Header>{toast.title}</Toast.Header>
-            <Toast.Body>{toast.text}</Toast.Body>
-          </Toast>
-        </ToastContainer>
+       
       </>
     );
 

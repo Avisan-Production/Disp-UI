@@ -4,6 +4,7 @@ import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import appsetting from "../../appsettings.json";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Profile(){
     const [name,SetName]=useState("")    
@@ -14,12 +15,7 @@ function Profile(){
     const [tell,SetTell]=useState("")
     const [accesses,SetAccesses]=useState([])
     const [newPass,SetNewPass]=useState("")
-    const [toast, setToast] = useState({
-        show: false,
-        title: "",
-        text: "",
-        bg: "",
-      });
+  
       const navigate=useNavigate();
     let GetUser=()=>{
         axios.get(`/api/user`)
@@ -50,7 +46,7 @@ function Profile(){
             axios.patch(`/api/user/update/profile`,dto)
             .then((res)=>{
                 console.log(res.data);
-                setToast({show:true,title:'پروفایل',text:res.data,bg:'success'})
+                toast(res.data,{type:'success'})
                 setTimeout(() => {
                     localStorage.clear();
                     navigate("/");
@@ -58,7 +54,7 @@ function Profile(){
             })
             .catch((err)=>{
                 console.log(err);
-                setToast({show:true,title:'پروفایل',text:err.response?err.response.data:'در ثبت اطلاعات شما خطا رخ داده است',bg:'danger'})
+                toast(err.response?err.response.data:'در ثبت اطلاعات شما خطا رخ داده است',{type:'danger'})
             })
         }
     }
@@ -72,7 +68,8 @@ function Profile(){
             axios.patch(`/api/user/update/pwd`,dto)
             .then((res)=>{
                 console.log(res.data);
-                setToast({show:true,title:'پروفایل',text:res.data,bg:'success'})
+                toast(res.data,{type:'success'})
+
                 setTimeout(() => {
                     localStorage.clear();
                     navigate("/");
@@ -80,7 +77,8 @@ function Profile(){
             })
             .catch((err)=>{
                 console.log(err);
-                setToast({show:true,title:'پروفایل',text:err.response?err.response.data:'در ثبت اطلاعات شما خطا رخ داده است',bg:'danger'})
+                toast(err.response?err.response.data:'در ثبت اطلاعات شما خطا رخ داده است',{type:'danger'})
+
             })
         }
     }
@@ -142,19 +140,7 @@ function Profile(){
             </div>
           </div>
         </div>
-        <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000} 
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
-
+       
       </>
     );
 

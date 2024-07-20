@@ -2,14 +2,13 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import bg from "../../../Assets/images/login-bg.jpg";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 
 
 function Forget (){
     const [username, setUsername] = useState("");
    
-    const [message, setMessage] = useState("");
-    const [messageClass, setMessageClass] = useState("");
     const navigate = useNavigate();
  
     var token=localStorage.getItem("token");
@@ -24,18 +23,16 @@ function Forget (){
           .post(`/api/user/forget`, dto)
           .then(function (response) {
             console.log(response);
-            setMessage(response.data)
-            setMessageClass("success")
+           toast(response.data,{type:'success'})
           })
           .catch(function (error) {
             console.log(error);
-            setMessage(error.response.data)
-            setMessageClass("danger")
+            toast(error.response.datal,{type:'error'})
+            
           });
       }
       else{
-        setMessage("نام کاربری را وارد نمایید ")
-        setMessageClass("danger")
+        toast("نام کاربری را وارد نمایید ",{type:'warning'})
       }
      
     };
@@ -69,15 +66,7 @@ function Forget (){
 
               <form onSubmit={handleSubmit} className="d-flex ">
                 <div className="col-12 col-md-8 mx-auto mt-5">
-                {message !== "" && (
-                <>
-                  <br />
-                  <div className={`alert alert-${messageClass}`}>
-                    {message}
-                  </div>
-                  <br />
-                </>
-              )}
+               
                   <div className="col-12 mb-3">
                     <p>نام کاربری را وارد کنید</p>
                     <input

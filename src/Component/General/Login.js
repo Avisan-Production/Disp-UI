@@ -1,21 +1,19 @@
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import bg from "../../Assets/images/login-bg.jpg";
 import { useEffect, useState } from "react";
-import appsetting from '../../appsettings.json'
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-
+import { useDispatch, useSelector } from "react-redux";
+import {setRFToken,setEmail,setMobile,setName,setRole,setToken,setUsername as setUname} from '../../redux/user/userAction'
+import { toast } from "react-toastify";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  let context = useOutletContext();
-  var token=localStorage.getItem("token");
-  if(token !==null){
-    navigate("/Dashboard");
-  }
+  const dispatch=useDispatch()
+ const {token}=useSelector(s=>s.user)
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     if (username.length > 0 && password.length > 0) {
@@ -23,22 +21,30 @@ const Login = () => {
       axios
         .post(`/api/user/login`, dto)
         .then(function (response) {
-          console.log(response);
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("refreshtoken", response.data.refreshToken);
-          context.setJwtToken("token");
-          navigate("/dashboard");
+          dispatch(setName(response.data.fullname))
+          dispatch(setEmail(response.data.email))
+          dispatch(setUname(response.data.username))
+          dispatch(setRole(response.data.role))
+          dispatch(setMobile(response.data.mobile))
+          dispatch(setToken(response.data.token))
+          dispatch(setRFToken(response.data.refreshToken))
+       toast("خوش آمدید", { type: "success" });
+           navigate("/dashboard");
         })
         .catch(function (error) {
           console.log(error);
-          setMessage(error.response.data)
+          toast(error.response?error.response.data:'در ورود به حساب کاربری خطا رخ داده است',{type:'error'})
         });
     }
-    // context.setJwtToken("a");
-    // navigate("/dashboard");
+ 
 
   };
   const [show,setShow]=useState(false)
+  useEffect(()=>{
+  if(token !== null||token!==undefined|| token!==''){
+    navigate("/dashboard")
+  }
+  },[])
   return (
     <>
       <div
@@ -65,13 +71,7 @@ const Login = () => {
           >
             <h2 className="text-center">سامانه مدیریت بار آویسان</h2>
             <p className="text-center mt-3">ورود به حساب کاربری</p>
-            {message !== "" && (
-              <>
-                <br />
-                <div className="alert alert-danger">{message}</div>
-                <br />
-              </>
-            )}
+            
 
             <form onSubmit={handleSubmit} className="d-flex">
               <div className="col-12 col-md-8 mx-auto mt-5">

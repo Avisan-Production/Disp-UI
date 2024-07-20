@@ -18,15 +18,11 @@ import {
 import Map from "../Map";
 import { Modal } from "react-bootstrap";
 import { Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 function Group() {
   const { id } = useParams();
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+ 
   const [chartData, setChartData] = useState([]);
   const [group, setGroup] = useState({});
   const [devices, setDevices] = useState([]);
@@ -174,19 +170,13 @@ function Group() {
       axios
         .post(`/api/group/timer`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",{
+          type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "تایمر",
-            text: "در ثبت درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast("در ثبت درخواست شما خطا رخ داده است",{
+            type: "danger",
           });
         });
     }
@@ -225,11 +215,8 @@ function Group() {
       })
       .catch((err) => {
         console.log(err.response.data);
-        setToast({
-          show: true,
-          title: "گروه ها",
-          text: "در واکشی اطلاعات گروه خطا رخ داده است",
-          bg: "danger",
+        toast("در واکشی اطلاعات گروه خطا رخ داده است",{
+         type: "danger",
         });
       });
   };
@@ -243,19 +230,13 @@ function Group() {
       axios
         .post(`/api/command/request/rels`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",{
+            type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "در ارسال درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast("در ارسال درخواست شما خطا رخ داده است",{
+           type: "danger",
           });
         });
     }
@@ -270,19 +251,13 @@ function Group() {
       axios
         .post(`/api/command/request/rels`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",{
+           type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "در ارسال درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast("در ارسال درخواست شما خطا رخ داده است",{
+           type: "danger",
           });
         });
     }
@@ -299,19 +274,13 @@ function Group() {
       axios
         .post(`/api/command/request`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast( "درخواست شما با موفقیت ثبت شد",{
+           type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "در ارسال درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast("در ارسال درخواست شما خطا رخ داده است",{
+          type: "danger",
           });
         });
     }
@@ -323,11 +292,8 @@ function Group() {
         setTemplates(response.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "لیست قالب پیامک",
-          text: "در دریافت لیست قالب های پیامک خطا رخ داده است",
-          bg: "danger",
+        toast("در دریافت لیست قالب های پیامک خطا رخ داده است",{
+          type: "danger",
         });
       });
   };
@@ -347,54 +313,39 @@ function Group() {
         axios
           .post(`/api/sms/send`, dto)
           .then((res) => {
-            setToast({
-              show: true,
-              title: "ارسال پیامک",
-              text: "پیامک با موفقیت ارسال شد",
-              bg: "success",
+            toast("پیامک با موفقیت ارسال شد",{
+              type: "success",
             });
             setSMSText("");
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "ارسال پیامک",
-              text: "در ارسال پیامک خطا رخ داده است",
-              bg: "danger",
+            toast( "در ارسال پیامک خطا رخ داده است",{
+             type: "danger",
             });
           });
       } else {
-        setToast({
-          show: true,
-          title: "ارسال پیامک",
-          text: "ایستگاهی جهت ارسال پیامک انتخاب نشد",
-          bg: "danger",
+        toast("ایستگاهی جهت ارسال پیامک انتخاب نشد",{
+         type: "danger",
         });
       }
       if (SaveAsTemplate) {
         axios
           .post(`/api/sms/template`, { text: smsText })
           .then((res) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: res.data,
-              bg: "success",
+            toast( res.data,{
+             type: "success",
             });
             GetTemplates();
             setSaveAsTemplate(false);
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: "در ذخیره قالب پیامک خطا رخ داده است",
-              bg: "danger",
+            toast( "در ذخیره قالب پیامک خطا رخ داده است",{
+            type: "danger",
             });
           });
       }
     } else {
-      setToast({
+      toast("متن پیامک نمی تواند خالی باشد",{
         show: true,
         title: "ارسال پیامک",
         text: "متن پیامک نمی تواند خالی باشد",
@@ -406,20 +357,14 @@ function Group() {
     axios
       .post(`/api/sms/template/remove/${id}`)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "قالب پیامک با موفقیت حذف شد",
-          bg: "success",
+        toast("قالب پیامک با موفقیت حذف شد",{
+         type: "success",
         });
         GetTemplates();
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "در حذف قالب پیامک خطا رخ داده است",
-          bg: "danger",
+        toast( "در حذف قالب پیامک خطا رخ داده است",{
+         type: "danger",
         });
       });
   };
@@ -871,18 +816,7 @@ function Group() {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+     
     </>
   );
 }

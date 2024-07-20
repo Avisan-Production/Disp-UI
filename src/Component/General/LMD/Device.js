@@ -8,15 +8,11 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { toast } from "react-toastify";
 
 function Device() {
   const { serial } = useParams();
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+
   const [modal, setModal] = useState(false);
   const [device, setDevice] = useState({});
   const [boards, setBoards] = useState([]);
@@ -64,20 +60,15 @@ function Device() {
       axios
         .post(`/api/command/console`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "کنسول",
-            text: "دستور ثبت شده است",
-            bg: "success",
+          toast("دستور ثبت شده است",
+            {
+            type: "success",
           });
           SetCommand("");
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "کنسول",
-            text: "در ثبت دستور خطا رخ داده است",
-            bg: "danger",
+          toast("در ثبت دستور خطا رخ داده است",{
+            type: "danger",
           });
         });
     }
@@ -102,11 +93,8 @@ function Device() {
           getFiles();
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "مستندات",
-            text: "در آپلود فایل مستندات خطا رخ داده است",
-            bg: "danger",
+          toast("در آپلود فایل مستندات خطا رخ داده است",{
+           type:'danger',
           });
         });
     }
@@ -117,20 +105,14 @@ function Device() {
       axios
         .post(`/api/device/files/remove`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "مستندات",
-            text: "فایل مستندات با موفقیت حذف شد",
-            bg: "success",
+          toast("فایل مستندات با موفقیت حذف شد",{
+            type: "success",
           });
           getFiles()
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "مستندات",
-            text: "در حذف فایل مستندات خطا رخ داده است",
-            bg: "danger",
+          toast( "در حذف فایل مستندات خطا رخ داده است",{
+            type: "danger",
           });
         });
     }
@@ -152,12 +134,7 @@ function Device() {
         SetContacts(res.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "لیست مخاطبین",
-          text: "در واکشی لیست مخاطبین خطا رخ داده است",
-          bg: "danger",
-        });
+        toast("در واکشی لیست مخاطبین خطا رخ داده است",{type:'danger'});
       });
   };
   let Addcontact = () => {
@@ -170,20 +147,14 @@ function Device() {
       axios
         .post(`/api/device/contact/`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "مخاطبین",
-            text: "مخاطب با موفقیت افزوده شد",
-            bg: "success",
+          toast("مخاطب با موفقیت افزوده شد",{
+            type: "success",
           });
           getContacts();
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "لیست مخاطبین",
-            text: "در ثبت مخاطب خطا رخ داده است",
-            bg: "danger",
+          toast("در ثبت مخاطب خطا رخ داده است",{
+           type: "danger",
           });
         });
     }
@@ -193,20 +164,14 @@ function Device() {
       axios
         .post(`/api/device/contact/remove`, cnt)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "مخاطبین",
-            text: "مخاطب با موفقیت حذف شد",
-            bg: "success",
+          toast("مخاطب با موفقیت حذف شد",{
+            type: "success",
           });
           getContacts();
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "لیست مخاطبین",
-            text: "در حذف مخاطب خطا رخ داده است",
-            bg: "danger",
+          toast("در حذف مخاطب خطا رخ داده است",{
+            type: "danger",
           });
         });
     }
@@ -252,22 +217,16 @@ function Device() {
         axios
           .post(`/api/device/board`, dto)
           .then((res) => {
-            setToast({
-              show: true,
-              title: "افزودن برد",
-              text: res.data,
-              bg: "success",
+            toast(res.data,{
+            type: "success",
             });
             getBoards();
             resetStates();
             setModal(false);
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "افزودن برد",
-              text: err.response.data,
-              bg: "danger",
+            toast(err.response.data,{
+              type: "danger",
             });
           });
       }
@@ -276,22 +235,16 @@ function Device() {
         axios
           .patch(`/api/device/board`, dto)
           .then((res) => {
-            setToast({
-              show: true,
-              title: "ویرایش برد",
-              text: res.data,
-              bg: "success",
+            toast(res.data,{
+              type: "success",
             });
             getBoards();
             resetStates();
             setModal(false);
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "ویرایش برد",
-              text: "در ویرایش برد خطا رخ داده است",
-              bg: "danger",
+            toast("در ویرایش برد خطا رخ داده است",{
+            type: "danger",
             });
           });
       }
@@ -306,20 +259,14 @@ function Device() {
       axios
         .post(`/api/device/board/remove`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "حذف برد",
-            text: res.data,
-            bg: "success",
+          toast(res.data,{
+            type: "success",
           });
           getBoards();
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "حذف برد",
-            text: "در حذف برد خطا رخ داده است",
-            bg: "danger",
+          toast("در حذف برد خطا رخ داده است",{
+            type: "danger",
           });
         });
     }
@@ -338,19 +285,13 @@ function Device() {
       axios
         .post(`/api/command/request`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "تغییر API",
-            text: res.data,
-            bg: "success",
+          toast( res.data,{
+            type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "تغییر API",
-            text: "در تغییر API خطا رخ داده است",
-            bg: "danger",
+          toast("در تغییر API خطا رخ داده است",{
+           type: "danger",
           });
         });
     }
@@ -363,20 +304,14 @@ function Device() {
       axios
         .post(`/api/device/remove`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "حذف دستگاه",
-            text: res.data,
-            bg: "success",
+          toast(res.data,{
+           type: "success",
           });
           navigator("/devices");
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "حذف دستگاه",
-            text: "در حذف پست خطا رخ داده است",
-            bg: "danger",
+          toast("در حذف پست خطا رخ داده است",{
+           type: "danger",
           });
         });
     }
@@ -422,20 +357,14 @@ function Device() {
     axios
       .patch(`/api/device/detail`, dto)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "ویرایش دستگاه",
-          text: res.data,
-          bg: "success",
+        toast(res.data,{
+          type: "success",
         });
         getDevice();
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "ویرایش دستگاه",
-          text: err.response.data,
-          bg: "danger",
+        toast(err.response.data,{
+          type: "danger",
         });
       });
   };
@@ -1007,18 +936,7 @@ function Device() {
           </Button>
         </Modal.Footer>
       </Modal>
-      <ToastContainer className="position-fixed m-3" >
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+   
     </>
   );
 }

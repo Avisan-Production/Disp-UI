@@ -4,10 +4,13 @@ import '../../../Assets/css/asideNav.css'
 import appsetting from '../../../appsettings.json'
 import { useEffect, useState } from 'react'
 import axios from "axios";
+import { useSelector } from "react-redux";
 
-const LMDAside=(props)=>{
+const LMDAside=()=>{
   const [devices,setDevices]=useState([]);
   const [searchDevices,setSearchDevices]=useState([]);
+  const {userAccess}=useSelector(s=>s.user)
+
   let getStation = () => {
     axios
       .get(`/api/device/boards/detail`)
@@ -27,10 +30,9 @@ const LMDAside=(props)=>{
   }
 const role=localStorage.getItem("role")
   useEffect(()=>{
-  },[props])
+  },[userAccess])
 
     useEffect(()=>{
-      console.log('fired!!!');
       getStation();
     },[])
     
@@ -66,7 +68,7 @@ const role=localStorage.getItem("role")
                     داشبورد
                   </a>
                 </li>
-                {props.report && (
+                {userAccess.includes(4) && (
                   <>
                     <li className="nav-item dropdown">
                       <a
@@ -131,7 +133,7 @@ const role=localStorage.getItem("role")
                     تنظیمات
                   </a>
                   <ul className="dropdown-menu">
-                    {props.station && (
+                    {userAccess.includes(0) && (
                       <>
                         <li>
                           <a className="dropdown-item" href="/devices">
@@ -140,7 +142,7 @@ const role=localStorage.getItem("role")
                         </li>
                       </>
                     )}
-                    {props.group && (
+                    {userAccess.includes(3) && (
                       <>
                         <li>
                           <a className="dropdown-item" href="/groups">
@@ -149,7 +151,7 @@ const role=localStorage.getItem("role")
                         </li>
                       </>
                     )}
-                    {props.user && (
+                    {userAccess.includes(7) && (
                       <>
                         <li>
                           <a className="dropdown-item" href="/users">

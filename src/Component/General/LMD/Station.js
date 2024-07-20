@@ -20,6 +20,7 @@ import Modal from "react-bootstrap/Modal";
 
 import appsetting from "../../../appsettings.json";
 import Map from "../Map";
+import { toast } from "react-toastify";
 
 function Station() {
   const { serial } = useParams();
@@ -29,12 +30,6 @@ function Station() {
   
 const [contacts,SetContacts]=useState([]);
 
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
   const [chartData, setChartData] = useState([]);
 
   // const [timer1Modal, setTimer1Modal] = useState(false);
@@ -94,20 +89,14 @@ const [contacts,SetContacts]=useState([]);
     axios
       .post(`/api/sms/template/remove/${id}`)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "قالب پیامک با موفقیت حذف شد",
-          bg: "success",
+        toast( "قالب پیامک با موفقیت حذف شد",{
+         type: "success",
         });
         GetTemplates();
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "در حذف قالب پیامک خطا رخ داده است",
-          bg: "danger",
+        toast( "در حذف قالب پیامک خطا رخ داده است",{
+         type: "danger",
         });
       });
   };
@@ -118,11 +107,8 @@ const [contacts,SetContacts]=useState([]);
         setTemplates(response.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "لیست قالب پیامک",
-          text: "در دریافت لیست قالب های پیامک خطا رخ داده است",
-          bg: "danger",
+        toast("در دریافت لیست قالب های پیامک خطا رخ داده است",{
+          type: "danger",
         });
       });
   };
@@ -135,20 +121,14 @@ const [contacts,SetContacts]=useState([]);
       axios
         .post(`/api/sms/send`, dto)
         .then((res) => {
-          setToast({
-            show: true,
-            title: "ارسال پیامک",
-            text: "پیامک با موفقیت ارسال شد",
-            bg: "success",
+          toast("پیامک با موفقیت ارسال شد",{
+           type: "success",
           });
           setSMSText("");
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "ارسال پیامک",
-            text: "در ارسال پیامک خطا رخ داده است",
-            bg: "danger",
+          toast( "در ارسال پیامک خطا رخ داده است",{
+           type: "danger",
           });
         });
 
@@ -156,36 +136,28 @@ const [contacts,SetContacts]=useState([]);
         axios
           .post(`/api/sms/template`, { text: smsText })
           .then((res) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: res.data,
-              bg: "success",
+            toast(res.data,{
+              type: "success",
             });
             GetTemplates();
             setSaveAsTemplate(false);
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: "در ذخیره قالب پیامک خطا رخ داده است",
-              bg: "danger",
+            toast("در ذخیره قالب پیامک خطا رخ داده است",{
+            type: "danger",
             });
           });
       }
     } else {
-      setToast({
-        show: true,
-        title: "ارسال پیامک",
-        text: "متن پیامک نمی تواند خالی باشد",
-        bg: "danger",
+      toast(
+       "متن پیامک نمی تواند خالی باشد",
+        {type: "danger",
       });
     }
   };
   let getData = () => {
     if(chartSelect>0){
-      setToast({show:true,title:'نمایش نمودار',text:'درخواست واکشی اطلاعات نمودار صادر شد لطفا منتظر بمانید',bg:'success'})
+      toast('درخواست واکشی اطلاعات نمودار صادر شد لطفا منتظر بمانید',{type:'success'})
       var now = new Date();
 
       var start = new Date(now);
@@ -205,11 +177,11 @@ const [contacts,SetContacts]=useState([]);
           setChartData(response.data.datas);
         })
         .catch((err)=>{
-          setToast({show:true,title:'نمایش نمودار',text:'در واکشی اطلاعات نمودار خطا رخ داده است',bg:'danger'})
+          toast('در واکشی اطلاعات نمودار خطا رخ داده است',{type:'danger'})
         });
     }
     else{
-      setToast({show:true,title:'نمایش نمودار',text:'ایستگاهی برای نمایش نمودار انتخاب نشد',bg:'danger'})
+      toast('ایستگاهی برای نمایش نمودار انتخاب نشد',{type:'danger'})
     }
   };
 
@@ -252,19 +224,13 @@ const [contacts,SetContacts]=useState([]);
         .patch(`/api/device/board/detail`, dto)
         .then(function (response) {
           resetExtra();
-          setToast({
-            show: true,
-            title: "ویرایش چیلر",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",
+            {type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "ویرایش چیلر",
-            text: "در ثبت درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast( "در ثبت درخواست شما خطا رخ داده است",
+            {type: "danger",
           });
         });
     }
@@ -277,19 +243,13 @@ const [contacts,SetContacts]=useState([]);
       axios
         .post(`/api/command/request`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",
+            {type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "در ثبت درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast( "در ثبت درخواست شما خطا رخ داده است",
+            {type: "danger",
           });
         });
     }
@@ -301,19 +261,13 @@ const [contacts,SetContacts]=useState([]);
       axios
         .post(`/api/command/request`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست شما با موفقیت ثبت شد",
+            {type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "در ثبت درخواست شما خطا رخ داده است",
-            bg: "danger",
+          toast( "در ثبت درخواست شما خطا رخ داده است",
+{type: "danger",
           });
         });
     
@@ -374,12 +328,7 @@ const [contacts,SetContacts]=useState([]);
       axios
         .post(`/api/command/request`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست شما با موفقیت ثبت شد",
-            bg: "success",
-          });
+          toast("درخواست شما با موفقیت ثبت شد", { type: "success" });
         });
     }
   };
@@ -492,12 +441,7 @@ const [contacts,SetContacts]=useState([]);
      SetContacts(res.data);
     })
     .catch((err) => {
-      setToast({
-        show: true,
-        title: "لیست مخاطبین",
-        text: "در واکشی لیست مخاطبین خطا رخ داده است",
-        bg: "danger",
-      });
+      toast("در واکشی لیست مخاطبین خطا رخ داده است", { type: "danger" });
     });
   }
   useEffect(() => {
@@ -1042,18 +986,7 @@ const [contacts,SetContacts]=useState([]);
           </div>
         </div>
       </div>
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+     
 
       <Modal show={timer2Modal} onHide={() => resetTimer2()}>
         <Modal.Header>

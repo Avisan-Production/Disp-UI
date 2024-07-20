@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { toast } from "react-toastify";
 
 function Users(){
 const [users,setUsers]=useState([]);
@@ -35,7 +36,6 @@ const [dashboardAccess,setdashboardAccess]=useState(false);
 const [usersAccess,setusersAccess]=useState(false);
 const [addUserAccess,setaddUserAccess]=useState(false);
 const [deleteUserAccess,setdeleteUserAccess]=useState(false);
-const [toast, setToast] = useState({show: false,title: "",text: "",bg: ""});
 
 
 var calculateAccessess=()=>{
@@ -135,23 +135,23 @@ var submit=()=>{
    if(isUpdateMode){
 axios.patch(`/api/user/update`,dto)
 .then((res)=>{
-    setToast({show:true,title:'ویرایش کاربر',text:res.data,bg:'success'})
+    toast(res.data,{type:'success'})
    getUsers();
 
 })
 .catch((err)=>{
-    setToast({show:true,title:'ویرایش کاربر',text:err.response.data,bg:'danger'})
+    toast(err.response.data,{type:'danger'})
 });
    }
    else{
     dto["password"]=password;
     axios.post(`/api/user/add`,dto)
     .then((res)=>{
-        setToast({show:true,title:'افزودن کاربر',text:res.data,bg:'success'})
+        toast(res.data,{type:'success'})
         getUsers();
     })
     .catch((err)=>{
-        setToast({show:true,title:'افزودن کاربر',text:err.response.data,bg:'danger'})
+        toast(err.response.data,{type:'danger'})
     });
    } 
 
@@ -179,12 +179,12 @@ var submitPassword=()=>{
  
   axios.patch(`/api/user/update/pwd`,dto)
   .then((res)=>{
-      setToast({show:true,title:'ویرایش کلمه عبور',text:res.data,bg:'success'})
+      toast(res.data,{type:'success'})
       getUsers();
       setPasswordModal(false)
   })
   .catch((err)=>{
-      setToast({show:true,title:'ویرایش کلمه عبور',text:err.response.data,bg:'danger'})
+      toast(err.response.data,{type:'danger'})
   });
  
 }
@@ -195,12 +195,12 @@ let removeUser=(username)=>{
     }
     axios.post(`/api/user/remove`,dto).then((response)=>
      {
-        setToast({show:true,title:"حذف کاربر",text:response.data,bg:'success'})
+        toast(response.data,{type:'success'})
 
         getUsers();
      })
      .catch((err)=>{
-      setToast({show:true,title:"حذف کاربر",text:"در حذف کاربر خطا رخ داده است",bg:'danger'})
+      toast("در حذف کاربر خطا رخ داده است",{type:'danger'})
      })
     }
 }
@@ -599,20 +599,7 @@ useEffect(()=>{
             </Button>
           </Modal.Footer>
         </Modal>
-        <ToastContainer className="position-fixed m-3" position="top-start">
-          <Toast
-            onClose={() =>
-              setToast({ show: false, title: "", text: "", bg: "" })
-            }
-            show={toast.show}
-            bg={toast.bg}
-            delay={3000}
-            autohide
-          >
-            <Toast.Header>{toast.title}</Toast.Header>
-            <Toast.Body>{toast.text}</Toast.Body>
-          </Toast>
-        </ToastContainer>
+       
       </>
     );
 

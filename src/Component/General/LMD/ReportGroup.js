@@ -17,12 +17,7 @@ function ReportGroup() {
   const [selectedDate, selectDate] = useState({});
   const [selectedGroup, SelectGroup] = useState(0);
   const [showChart, ShowChart] = useState(false);
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+ 
   const [chartData, setChartData] = useState([]);
 
   var chartWith =
@@ -172,18 +167,6 @@ function ReportGroup() {
         )}
       </div>
 
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
     </>
   );
 }

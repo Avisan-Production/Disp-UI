@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { toast } from "react-toastify";
 function Groups() {
   const [groups, setGroups] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -18,12 +19,7 @@ function Groups() {
   const [addGroupModal, setAddModalModal] = useState(true);
   const [search,setSearch]=useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+  
   let Search=(txt)=>{
     setSearchQuery(txt)
   console.log(devices);
@@ -45,11 +41,8 @@ function Groups() {
         console.log(res.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "گروه ها",
-          text: "در دریافت اطلاعات خطا رخ داده است",
-          bg: "danger",
+        toast("در دریافت اطلاعات خطا رخ داده است",{
+        type: "danger",
         });
       });
   };
@@ -64,11 +57,8 @@ function Groups() {
         // checkThem(groupDevices)
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "گروه ها",
-          text: "در دریافت اطلاعات خطا رخ داده است",
-          bg: "danger",
+        toast("در دریافت اطلاعات خطا رخ داده است",{
+          type: "danger",
         });
       });
   };
@@ -88,21 +78,15 @@ let removeGroup=(id)=>{
     if(window.confirm('آیا از حذف گروه مطمئن هستید ؟ ')){
         axios.post(`/api/group/remove/${id}`)
         .then((res)=>{
-           setToast({
-               show: true,
-               title: "گروه ها",
-               text: "گروه با موفقیت حذف شد",
-               bg: "success",
+           toast( "گروه با موفقیت حذف شد",{
+              type: "success",
              }); 
              getGroups()
              
         })
         .catch((err)=>{
-           setToast({
-               show: true,
-               title: "گروه ها",
-               text: "در حذف گروه خطا رخ داده است",
-               bg: "danger",
+           toast("در حذف گروه خطا رخ داده است",{
+              type: "danger",
              }); 
         })
     }
@@ -133,22 +117,16 @@ let SubmitGroup=(add)=>{
                  console.log(dto); 
                  axios.post(`/api/group`,dto)
                  .then((res)=>{
-                    setToast({
-                        show: true,
-                        title: "گروه ها",
-                        text: "گروه با موفقیت ثبت شد",
-                        bg: "success",
+                    toast("گروه با موفقیت ثبت شد",{
+                       type: "success",
                       }); 
                       getGroups()
                       setShowModal(false)
                       resetModal()
                  })
                  .catch((err)=>{
-                    setToast({
-                        show: true,
-                        title: "گروه ها",
-                        text: err.response.data,
-                        bg: "danger",
+                    toast(err.response.data,{
+                        type: "danger",
                       }); 
                  })
             }
@@ -161,43 +139,31 @@ let SubmitGroup=(add)=>{
                  console.log(dto); 
                  axios.patch(`/api/group`,editdto)
                  .then((res)=>{
-                    setToast({
-                        show: true,
-                        title: "گروه ها",
-                        text: "گروه با موفقیت ویرایش شد",
-                        bg: "success",
+                    toast( "گروه با موفقیت ویرایش شد",{
+                       type: "success",
                       }); 
                       getGroups()
                       setShowModal(false)
                       resetModal()
                  })
                  .catch((err)=>{
-                    setToast({
-                        show: true,
-                        title: "گروه ها",
-                        text: "در ویرایش گروه خطا رخ داده است",
-                        bg: "danger",
+                    toast( "در ویرایش گروه خطا رخ داده است",{
+                     type: "danger",
                       }); 
                  })
             }
            
         }
         else{
-            setToast({
-                show: true,
-                title: "گروه ها",
-                text: "پستی برای گروه انتخاب نشده است",
-                bg: "danger",
+            toast("پستی برای گروه انتخاب نشده است",{
+                type: "danger",
               }); 
         }
       
     }
     else{
-        setToast({
-            show: true,
-            title: "گروه ها",
-            text: "نام گروه نمی تواند خالی باشد",
-            bg: "danger",
+        toast( "نام گروه نمی تواند خالی باشد",{
+            type: "danger",
           });
     }
 }
@@ -293,18 +259,7 @@ let openEditModal=(group)=>{
           </div>
         </div>
       </div>
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+    
       <Modal show={showModal} onHide={() => resetModal()}>
         <Modal.Header>
           <Modal.Title>

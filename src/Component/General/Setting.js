@@ -2,16 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import { toast } from "react-toastify";
 
 export default function Setting() {
   const [connectedMarker, setConnectedMarker] = useState(0);
   const [disconnectedMarker, setDisconnectedMarker] = useState(0);
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+  
   const role = localStorage.getItem("role");
   if (role !== "0") {
     window.location.href = "/dashboard";
@@ -36,20 +32,16 @@ export default function Setting() {
     .then((res) => {
       console.log(res.data);
       getSettings()
-      setToast({
-        show: true,
-        title: "تنظیمات",
-        text: res.data,
-        bg: "success",
+      toast(
+        res.data
+        ,{
+        type: "success",
       });
     })
     .catch((err) => {
       console.log(err);
-      setToast({
-        show: true,
-        title: "تنظیمات",
-        text: err.response.data,
-        bg: "danger",
+      toast(err.response.data,{
+        type: "danger",
       });
     });
   }
@@ -94,18 +86,7 @@ export default function Setting() {
           </div>
         </div>
       </div>
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+     
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import vocab from "../../../vocab.config.json";
 import appsetting from "../../../appsettings.json";
@@ -10,6 +10,7 @@ import ToastContainer from "react-bootstrap/ToastContainer";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import DashboardItem from "../../DashboardItem";
+import { toast } from "react-toastify";
 
 const LMDDashboard = () => {
   const [modal, setModal] = useState(false);
@@ -23,12 +24,7 @@ const LMDDashboard = () => {
   const [sortConnect, setSortConnect] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState([]);
   const [temp, setTemp] = useState(false);
-  const [toast, setToast] = useState({
-    show: false,
-    title: "",
-    text: "",
-    bg: "",
-  });
+  
 
   const [smsTemplates, setTemplates] = useState([]);
   const [smsText, setSMSText] = useState("");
@@ -137,27 +133,18 @@ remSerials(item.id,item.boardNumber)
         axios
           .post(`/api/command/request/rels`, dto)
           .then(function (response) {
-            setToast({
-              show: true,
-              title: "درخواست",
-              text: "درخواست با موفقیت ثبت شد",
-              bg: "success",
+            toast("درخواست با موفقیت ثبت شد",{
+             type: "success",
             });
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "درخواست",
-              text: "ارسال درخواست خطا رخ داده است",
-              bg: "danger",
+            toast("ارسال درخواست خطا رخ داده است",{
+              type: "danger",
             });
           });
       } else {
-        setToast({
-          show: true,
-          title: "درخواست",
-          text: "پستی انتخاب نشده است",
-          bg: "danger",
+        toast("پستی انتخاب نشده است",{
+          type: "danger",
         });
       }
     }
@@ -172,27 +159,18 @@ remSerials(item.id,item.boardNumber)
       axios
         .post(`/api/command/request/rels`, dto)
         .then(function (response) {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "درخواست با موفقیت ثبت شد",
-            bg: "success",
+          toast("درخواست با موفقیت ثبت شد",{
+            type: "success",
           });
         })
         .catch((err) => {
-          setToast({
-            show: true,
-            title: "درخواست",
-            text: "ارسال درخواست خطا رخ داده است",
-            bg: "danger",
+          toast( "ارسال درخواست خطا رخ داده است",{
+           type: "danger",
           });
         });
     } else {
-      setToast({
-        show: true,
-        title: "درخواست",
-        text: "پستی انتخاب نشده است",
-        bg: "danger",
+      Toast("پستی انتخاب نشده است",{
+       type: "danger",
       });
     }
   }
@@ -204,11 +182,8 @@ remSerials(item.id,item.boardNumber)
         setTemplates(response.data);
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "لیست قالب پیامک",
-          text: "در دریافت لیست قالب های پیامک خطا رخ داده است",
-          bg: "danger",
+        toast("در دریافت لیست قالب های پیامک خطا رخ داده است",{
+         type: "danger",
         });
       });
   };
@@ -228,58 +203,40 @@ remSerials(item.id,item.boardNumber)
         axios
           .post(`/api/sms/send`, dto)
           .then((res) => {
-            setToast({
-              show: true,
-              title: "ارسال پیامک",
-              text: "پیامک با موفقیت ارسال شد",
-              bg: "success",
+            toast("پیامک با موفقیت ارسال شد",{
+             type: "success",
             });
             setSMSText("");
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "ارسال پیامک",
-              text: "در ارسال پیامک خطا رخ داده است",
-              bg: "danger",
+            toast( "در ارسال پیامک خطا رخ داده است",{
+             type: "danger",
             });
           });
       } else {
-        setToast({
-          show: true,
-          title: "ارسال پیامک",
-          text: "ایستگاهی جهت ارسال پیامک انتخاب نشد",
-          bg: "danger",
+        toast("ایستگاهی جهت ارسال پیامک انتخاب نشد",{
+          type: "danger",
         });
       }
       if (SaveAsTemplate) {
         axios
           .post(`/api/sms/template`, { text: smsText })
           .then((res) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: res.data,
-              bg: "success",
+            toast(res.data,{
+              type: "success",
             });
             GetTemplates();
             setSaveAsTemplate(false);
           })
           .catch((err) => {
-            setToast({
-              show: true,
-              title: "قالب پیامک",
-              text: "در ذخیره قالب پیامک خطا رخ داده است",
-              bg: "danger",
+            toast("در ذخیره قالب پیامک خطا رخ داده است",{
+             type: "danger",
             });
           });
       }
     } else {
-      setToast({
-        show: true,
-        title: "ارسال پیامک",
-        text: "متن پیامک نمی تواند خالی باشد",
-        bg: "danger",
+      toast( "متن پیامک نمی تواند خالی باشد",{
+       type: "danger",
       });
     }
   };
@@ -324,20 +281,14 @@ remSerials(item.id,item.boardNumber)
     axios
       .post(`/api/sms/template/remove/${id}`)
       .then((res) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "قالب پیامک با موفقیت حذف شد",
-          bg: "success",
+        toast("قالب پیامک با موفقیت حذف شد",{
+          type: "success",
         });
         GetTemplates();
       })
       .catch((err) => {
-        setToast({
-          show: true,
-          title: "قالب پیامک",
-          text: "در حذف قالب پیامک خطا رخ داده است",
-          bg: "danger",
+        toast("در حذف قالب پیامک خطا رخ داده است",{
+         type: "danger",
         });
       });
   };
@@ -397,9 +348,6 @@ remSerials(item.id,item.boardNumber)
     console.log("fires");
   }, []);
 
-  const context = useOutletContext();
-
-  context.setSYSName("سامانه LMD");
 
   const formatPowerValue=(val)=>{
     if (val>1000000000000){
@@ -793,18 +741,7 @@ remSerials(item.id,item.boardNumber)
           </div>
         </div>
       </div>
-      <ToastContainer className="position-fixed m-3" position="top-start">
-        <Toast
-          onClose={() => setToast({ show: false, title: "", text: "", bg: "" })}
-          show={toast.show}
-          bg={toast.bg}
-          delay={3000}
-          autohide
-        >
-          <Toast.Header>{toast.title}</Toast.Header>
-          <Toast.Body>{toast.text}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+     
       <Modal show={modal} onHide={() => setModal(false)}>
         <Modal.Header>
           <Modal.Title>ارسال پیامک</Modal.Title>
