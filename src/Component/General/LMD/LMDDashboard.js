@@ -24,6 +24,7 @@ const LMDDashboard = () => {
   const [sortConnect, setSortConnect] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState([]);
   const [temp, setTemp] = useState(false);
+  const [totalApower, setTotalApower] = useState(0);
   
 
   const [smsTemplates, setTemplates] = useState([]);
@@ -68,6 +69,27 @@ var arr=[]
 
 for(var item of devices){
   arr.push({stationID:item.id,board:item.boardNumber})
+}
+
+      setSelectedDevices(arr);
+    }
+    // var srch = search;
+    // setSearch([])
+    // setTimeout(() => {
+    //   setSearch(srch);
+    // }, 100);
+  }
+  function checkConnectedAll() {
+    if (selectedDevices.length > 0) {
+      setSelectedDevices([]);
+    } else {
+var arr=[]
+
+for(var item of devices){
+  if(item.isConnected){
+    arr.push({stationID:item.id,board:item.boardNumber})
+
+  }
 }
 
       setSelectedDevices(arr);
@@ -207,6 +229,7 @@ remSerials(item.id,item.boardNumber)
              type: "success",
             });
             setSMSText("");
+            
           })
           .catch((err) => {
             toast( "در ارسال پیامک خطا رخ داده است",{
@@ -234,6 +257,7 @@ remSerials(item.id,item.boardNumber)
             });
           });
       }
+      setModal(false)
     } else {
       toast( "متن پیامک نمی تواند خالی باشد",{
        type: "danger",
@@ -317,6 +341,10 @@ remSerials(item.id,item.boardNumber)
               .getAttribute("data-sort-con") === "true"
               ? true
               : false;
+
+
+
+              
           var data = response.data.devices.sort((a, b) => {
             var ret = 0;
             if (ap) ret += b.activePower - a.activePower;
@@ -329,6 +357,14 @@ remSerials(item.id,item.boardNumber)
 
           setDeices(data);
           setSearch(data);
+
+          var aptotal=0;
+          for (var d of response.data.devices){
+            if (d.isConnected){
+              aptotal+=d.activePower
+            }
+          }
+          setTotalApower(aptotal)
         }
       });
   };
@@ -401,7 +437,10 @@ remSerials(item.id,item.boardNumber)
                 </a>
               </li>
             </ul>
-            <div className="mt-3 dashboard_actions" style={{ margin: "auto auto auto 5px" }}>
+            <div
+              className="mt-3 dashboard_actions"
+              style={{ margin: "auto auto auto 5px" }}
+            >
               <button
                 className="btn btn-primary"
                 style={{ marginLeft: "5px" }}
@@ -497,9 +536,10 @@ remSerials(item.id,item.boardNumber)
                       className="form-control text-center"
                       dir="ltr"
                       value={
-                        dashInfo.totalActivePower !== undefined
-                          ? formatPowerValue(dashInfo.totalActivePower)
-                          : dashInfo.totalActivePower
+                        // dashInfo.totalActivePower !== undefined
+                        //   ? formatPowerValue(dashInfo.totalActivePower)
+                        //   : dashInfo.totalActivePower
+                        formatPowerValue(totalApower)
                       }
                       disabled
                     ></input>
@@ -508,102 +548,135 @@ remSerials(item.id,item.boardNumber)
                 <hr />
                 <br />
                 <p>تعداد {selectedDevices.length} ایستگاه انتخاب شده است</p>
-                <div className="table-responsive" >
-                <table className="table table-hover ">
-                  <thead>
-                    <tr>
-                      <td>#</td>
+                <div className="table-responsive">
+                  <table className="table table-hover ">
+                    <thead>
+                      <tr>
+                        <td>#</td>
 
-                      <td>
-                        <div className="d-flex justify-content-center">
-                          {searchMode ? (
-                            <>
+                        <td>
+                          <div className="d-flex justify-content-center">
+                            {searchMode ? (
+                              <>
+                                <input
+                                  className="form-control"
+                                  id="devSearch"
+                                  type="search"
+                                  onChange={(e) => Search(e.target.value)}
+                                />
+                                <button
+                                  className="btn-none"
+                                  onClick={() => setSearchMode(false)}
+                                >
+                                  <FontAwesomeIcon
+                                    icon={solid("times-circle")}
+                                  />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  className="btn-none mt-auto mb-auto hover"
+                                  onClick={() => setSearchMode(true)}
+                                >
+                                  <FontAwesomeIcon icon={solid("search")} />
+                                </button>
+                                <p className="text-center mt-auto mb-auto me-2">
+                                  نام {vocab.devices}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                        <td>توان اسمی</td>
+                        <td>
+                          توان لحظه ای
+                          <button
+                            style={{ color: sortAp ? "#000" : "#ccc" }}
+                            data-sort-ap={sortAp}
+                            className="btn-none mt-auto mb-auto hover"
+                            onClick={() => sort(0)}
+                          >
+                            <FontAwesomeIcon icon={solid("sort-alpha-down")} />
+                          </button>
+                        </td>
+                        <td>نوع ایستگاه</td>
+                        <td>
+                          وضعیت ایستگاه
+                          <button
+                            style={{ color: sortRelay ? "#000" : "#ccc" }}
+                            data-sort-rel={sortRelay}
+                            className="btn-none mt-auto mb-auto hover"
+                            onClick={() => sort(1)}
+                          >
+                            <FontAwesomeIcon icon={solid("sort-alpha-down")} />
+                          </button>
+                        </td>
+                        <td>
+                          ارتباط با سامانه
+                          <button
+                            style={{ color: sortConnect ? "#000" : "#ccc" }}
+                            data-sort-con={sortConnect}
+                            className="btn-none mt-auto mb-auto hover"
+                            onClick={() => sort(2)}
+                          >
+                            <FontAwesomeIcon icon={solid("sort-alpha-down")} />
+                          </button>
+                        </td>
+                        <td>
+                          <div class="btn-group dropup" dir="rtl"> 
+                            <button
+                              type="button"
+                              className="btn-none dropdown-toggle p-2"
+                              data-bs-toggle="dropdown"
+                              aria-expanded="false"
+                            >
                               <input
-                                className="form-control"
-                                id="devSearch"
-                                type="search"
-                                onChange={(e) => Search(e.target.value)}
+                                type="checkbox"
+                                onChange={() => checkAll()}
+                                disabled
+                                checked={selectedDevices.length > 0}
                               />
-                              <button
-                                className="btn-none"
-                                onClick={() => setSearchMode(false)}
-                              >
-                                <FontAwesomeIcon icon={solid("times-circle")} />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                className="btn-none mt-auto mb-auto hover"
-                                onClick={() => setSearchMode(true)}
-                              >
-                                <FontAwesomeIcon icon={solid("search")} />
-                              </button>
-                              <p className="text-center mt-auto mb-auto me-2">
-                                نام {vocab.devices}
-                              </p>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td>توان اسمی</td>
-                      <td>
-                        توان لحظه ای
-                        <button
-                          style={{ color: sortAp ? "#000" : "#ccc" }}
-                          data-sort-ap={sortAp}
-                          className="btn-none mt-auto mb-auto hover"
-                          onClick={() => sort(0)}
-                        >
-                          <FontAwesomeIcon icon={solid("sort-alpha-down")} />
-                        </button>
-                      </td>
-                      <td>نوع ایستگاه</td>
-                      <td>
-                        وضعیت ایستگاه
-                        <button
-                          style={{ color: sortRelay ? "#000" : "#ccc" }}
-                          data-sort-rel={sortRelay}
-                          className="btn-none mt-auto mb-auto hover"
-                          onClick={() => sort(1)}
-                        >
-                          <FontAwesomeIcon icon={solid("sort-alpha-down")} />
-                        </button>
-                      </td>
-                      <td>
-                        ارتباط با سامانه
-                        <button
-                          style={{ color: sortConnect ? "#000" : "#ccc" }}
-                          data-sort-con={sortConnect}
-                          className="btn-none mt-auto mb-auto hover"
-                          onClick={() => sort(2)}
-                        >
-                          <FontAwesomeIcon icon={solid("sort-alpha-down")} />
-                        </button>
-                      </td>
-                      <td>
-                        <input type="checkbox" onChange={() => checkAll()} checked={selectedDevices.length>0} />
-                          
-                      </td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {devices.length > 0
-                      ? search.map((item, i) => (
-                          // <DashboardItem
-                          //   key={i}
-                          //   onSelect={() => setSerials(x.serial, x.boardNumber)}
-                          //   onUnSelect={() =>
-                          //     remSerials(x.serial, x.boardNumber)
-                          //   }
-                          //   item={x}
-                          //   row={i + 1}
-                          //   addList={selectedDevices}
-                          //   selected={checkSelect(x)}
-                          // />
-                          <tr>
-          <td>
-            {/* <span style={{marginRight:'-5px',marginLeft:'5px'}}>
+                            </button>
+                            <ul className="dropdown-menu " style={{padding:'5px'}} dir="rtl">
+                              <li style={{textAlign:'right',padding:'3px'}} className="text-right" dir="rtl" >
+                                <input
+                                  type="checkbox"
+                                  onChange={() => checkAll()}
+                                  checked={selectedDevices.length > 0}
+                                />{" "}
+                                <label>انتخاب همه</label>
+                              </li>
+                              <li style={{textAlign:'right',padding:'3px'}} className="text-right" dir="rtl">
+                                <input
+                                  type="checkbox"
+                                  onChange={() => checkConnectedAll()}
+                                  checked={selectedDevices.length > 0}
+                                />{" "}
+                                <label>انتخاب متصل ها</label>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {devices.length > 0
+                        ? search.map((item, i) => (
+                            // <DashboardItem
+                            //   key={i}
+                            //   onSelect={() => setSerials(x.serial, x.boardNumber)}
+                            //   onUnSelect={() =>
+                            //     remSerials(x.serial, x.boardNumber)
+                            //   }
+                            //   item={x}
+                            //   row={i + 1}
+                            //   addList={selectedDevices}
+                            //   selected={checkSelect(x)}
+                            // />
+                            <tr>
+                              <td>
+                                {/* <span style={{marginRight:'-5px',marginLeft:'5px'}}>
                               {selected &&
                                 <>
                                 
@@ -612,82 +685,87 @@ remSerials(item.id,item.boardNumber)
                                 
                                 }
                                 </span> */}
-            <span>{i+1}</span>
-          </td>
+                                <span>{i + 1}</span>
+                              </td>
 
-          <td>
-            <Link to={`/station/${item.id}`}>
-              {item.deviceName + " - " + item.boardName}
-            </Link>{" "}
-          </td>
-          <td>{item.nominalPower}</td>
-          <td data-el="ap">
-            <span dir="ltr">{item.activePower.toFixed(2) + " KW "}</span>{" "}
-          </td>
-          <td>
-            {item.type === 1 && (
-              <>
-                <FontAwesomeIcon
-                  icon={solid("bullhorn")}
-                  className="text-danger"
-                />
-              </>
-            )}
-          </td>
+                              <td>
+                                <Link to={`/station/${item.id}`}>
+                                  {item.deviceName + " - " + item.boardName}
+                                </Link>{" "}
+                              </td>
+                              <td>{item.nominalPower}</td>
+                              <td data-el="ap">
+                                <span dir="ltr">
+                                  {item.activePower.toFixed(2) + " KW "}
+                                </span>{" "}
+                              </td>
+                              <td>
+                                {item.type === 1 && (
+                                  <>
+                                    <FontAwesomeIcon
+                                      icon={solid("bullhorn")}
+                                      className="text-danger"
+                                    />
+                                  </>
+                                )}
+                              </td>
 
-          <td>{item.relay ? "وصل" : "قطع"}</td>
-          <td>
-            <span
-              className={`updater-connection ${
-                item.isConnected ? "connected" : "disconnected"
-              }`}
-              data-el="con"
-            ></span>
-          </td>
-          <td>
-          
-                <input type="checkbox" onChange={(e)=>check(e,item)}  checked={checkSelect(item)} />
-                {/* <button className="btn-none hover" onClick={props.onUnSelect}>
+                              <td>{item.relay ? "وصل" : "قطع"}</td>
+                              <td>
+                                <span
+                                  className={`updater-connection ${
+                                    item.isConnected
+                                      ? "connected"
+                                      : "disconnected"
+                                  }`}
+                                  data-el="con"
+                                ></span>
+                              </td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  onChange={(e) => check(e, item)}
+                                  checked={checkSelect(item)}
+                                />
+                                {/* <button className="btn-none hover" onClick={props.onUnSelect}>
                                     لغو
                                   </button> */}
-          
-          </td>
-        </tr>
-                        ))
-                      : [0, 1, 2, 3, 4, 5].map((x) => (
-                          <>
-                            <tr key={x}>
-                              <td colSpan={2}>
-                                <p className="skeleton"></p>
-                              </td>
-                              <td>
-                                <p className="skeleton"></p>
-                              </td>
-                              <td data-el="ap">
-                                <p className="skeleton"></p>
-                              </td>
-                              <td>
-                                <p className="skeleton"></p>
-                              </td>
-                              <td>
-                                <p className="skeleton"></p>
-                              </td>
-                              <td>
-                                <p className="skeleton"></p>
-                              </td>
-                              <td>
-                                <p
-                                  className={`updater-connection `}
-                                  data-el="con"
-                                ></p>
                               </td>
                             </tr>
-                          </>
-                        ))}
-                  </tbody>
-                </table>
+                          ))
+                        : [0, 1, 2, 3, 4, 5].map((x) => (
+                            <>
+                              <tr key={x}>
+                                <td colSpan={2}>
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td>
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td data-el="ap">
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td>
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td>
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td>
+                                  <p className="skeleton"></p>
+                                </td>
+                                <td>
+                                  <p
+                                    className={`updater-connection `}
+                                    data-el="con"
+                                  ></p>
+                                </td>
+                              </tr>
+                            </>
+                          ))}
+                    </tbody>
+                  </table>
                 </div>
-            
               </div>
               <div
                 className="tab-pane fade  active"
@@ -741,7 +819,7 @@ remSerials(item.id,item.boardNumber)
           </div>
         </div>
       </div>
-     
+
       <Modal show={modal} onHide={() => setModal(false)}>
         <Modal.Header>
           <Modal.Title>ارسال پیامک</Modal.Title>

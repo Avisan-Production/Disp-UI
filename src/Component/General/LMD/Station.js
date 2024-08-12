@@ -148,6 +148,7 @@ const [contacts,SetContacts]=useState([]);
             });
           });
       }
+      setSMSModal(false)
     } else {
       toast(
        "متن پیامک نمی تواند خالی باشد",

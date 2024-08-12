@@ -47,6 +47,9 @@ function Device() {
   const [contacts, SetContacts] = useState([]);
   const [ContactName, SetContactName] = useState("");
   const [ContactNumber, SetContactNumber] = useState("");
+  
+  const [groups, SetGroups] = useState([]);
+  const [group, SetGroup] = useState({});
 
   const navigator = useNavigate();
   let cntRow = 0;
@@ -383,9 +386,51 @@ function Device() {
       });
   };
 
+  let getGroup=()=>{
+    axios.get("/api/group/all")
+    .then(res=>{
+      console.log(res.data);
+      SetGroups(res.data)
+      for(var g of res.data){
+        console.log(serial);
+        if(g.devices.includes(parseInt(serial))){
+          console.log(g);
+          SetGroup(g)
+        }
+      }
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+  }
+  const submitGroup=()=>{
+    console.log(group);
+    if(group.id>0){
+
+      var dto={
+        id:group.id,
+        name:group.name,
+        devices:[...group.devices,parseInt(serial)]
+      }
+      axios.patch("/api/group",dto)
+      .then(res=>{
+        toast(res.data,{type:'success'})
+        getGroup();
+      })
+      .catch(err=>{
+        toast(err.response!==undefined?err.response.data:'در ثبت گروه خطا رخ داده است',{type:'error'})
+
+      })
+      console.log(dto);
+    }
+    else{
+      toast("گروه را انتخاب کنید",{type:'warning'})
+    }
+  }
   useEffect(() => {
     getDevice();
     getBoards();
+    getGroup();
     getContacts();
     getFiles();
   }, []);
@@ -515,6 +560,30 @@ function Device() {
                 onClick={() => editDevice()}
               >
                 ثبت تغییرات
+              </button>
+            </div>
+          </div>
+          <div className="card mt-5">
+            <div className="card-header bg-dark text-white d-flex justify-content-start">
+              گروه بندی ایستگاه
+            </div>
+            <div className="card-body ">
+              <div className="mb-2">
+                <p>گروه را انتخاب کنید</p>
+                <select className="form-control" value={group.id} onChange={(e)=>SetGroup(parseInt(e.target.value)>0?groups.filter(x=>x.id===parseInt(e.target.value))[0]:{id:0,name:''})}>
+                  <option value={0}>گروه را انتخاب کنید</option>
+                  {groups.map((g,ind)=>(<>
+                    <option key={`gkey-${ind}`} value={g.id}>{g.name}</option>
+                  </>))}
+                </select>
+              </div>
+            </div>
+            <div className="card-footer">
+              <button
+                className="btn btn-primary w-100"
+                onClick={ ()=>submitGroup()}
+              >
+                ثبت 
               </button>
             </div>
           </div>

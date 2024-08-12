@@ -91,7 +91,7 @@ const Login = () => {
                     onChange={(event) => setPassword(event.target.value)}
                     type={show?"text":"password"}
                   ></input>
-                  <button className="btn-none" onClick={()=>setShow(!show)}>
+                  <button className="btn-none" type="button" onClick={()=>setShow(!show)}>
                     {show?<>
                     <FontAwesomeIcon icon={solid('eye-slash')}/>
                     </>:
